@@ -495,15 +495,15 @@ class Zt {
     return this._log(ie.SUCCESS, t, i);
   }
 }
-var $ = new Zt();
-class Xt {
+var X = new Zt();
+class $t {
   /** @param {{authFlow: any}} authFlow */
   constructor(t) {
     this._authFlow = t;
     try {
       this._mendeleySdk = MendeleySDK(t);
     } catch {
-      $.warn("SDK_INIT_FALLBACK", {
+      X.warn("SDK_INIT_FALLBACK", {
         message: "MendeleySDK standalone not available, fallback to mock mode"
       });
     }
@@ -521,7 +521,7 @@ class Xt {
    */
   getItems(t, i, n) {
     if (this._isDemoMode()) {
-      $.info("FETCHING_DEMO_ITEMS", {
+      X.info("FETCHING_DEMO_ITEMS", {
         search: t,
         count: He.length
       });
@@ -1280,7 +1280,7 @@ class St {
       label: "",
       name: "",
       value: "on"
-    }, i)), u(Z, this, $t).call(this), O(k, this, document.createElement("div")), O(Te, this, document.createElement("span")), u(Z, this, Qt).call(this), u(Z, this, ei).call(this), u(Z, this, et).call(this), !a(b, this).name)
+    }, i)), u(Z, this, Xt).call(this), O(k, this, document.createElement("div")), O(Te, this, document.createElement("span")), u(Z, this, Qt).call(this), u(Z, this, ei).call(this), u(Z, this, et).call(this), !a(b, this).name)
       throw new Error("Name attribute is required");
     var s = Ie._.get(a(b, this).name);
     s || (s = new Array(), Ie._.set(a(b, this).name, s)), s.push(this);
@@ -1353,7 +1353,7 @@ class St {
     }
   }
 }
-function $t() {
+function Xt() {
   a(H, this).type = "radio";
   var e = a(H, this).getAttribute("id"), t = a(H, this).getAttribute("name"), i = a(H, this).getAttribute("value"), n = a(H, this).getAttribute("checked"), s = a(H, this).getAttribute("disabled");
   e !== null ? a(b, this).id = e : a(b, this).id && a(H, this).setAttribute("id", a(b, this).id), t !== null ? a(b, this).name = t : a(b, this).name && a(H, this).setAttribute("name", a(b, this).name), i !== null ? a(b, this).value = i : a(b, this).value && a(H, this).setAttribute("value", a(b, this).value), n !== null ? a(b, this).checked = n === "true" : a(b, this).checked && a(H, this).setAttribute("checked", "true"), s !== null ? a(b, this).disabled = s === "true" : a(b, this).disabled && a(H, this).setAttribute("disabled", "true");
@@ -2579,10 +2579,10 @@ function at() {
     }).then((r) => (Asc.scope.bibStyle = null, r));
   }), at.apply(this, arguments);
 }
-var le = /* @__PURE__ */ new WeakMap(), Q = /* @__PURE__ */ new WeakMap(), X = /* @__PURE__ */ new WeakMap(), Tt = /* @__PURE__ */ new WeakSet();
+var le = /* @__PURE__ */ new WeakMap(), Q = /* @__PURE__ */ new WeakMap(), $ = /* @__PURE__ */ new WeakMap(), Tt = /* @__PURE__ */ new WeakSet();
 class fi {
   constructor() {
-    he(this, Tt), V(this, le, void 0), V(this, Q, void 0), V(this, X, void 0), O(le, this, []), O(Q, this, []), O(X, this, []), this.size = 0;
+    he(this, Tt), V(this, le, void 0), V(this, Q, void 0), V(this, $, void 0), O(le, this, []), O(Q, this, []), O($, this, []), this.size = 0;
   }
   /** @returns {CitationItem} */
   /**
@@ -2603,7 +2603,7 @@ class fi {
     return t = t.toString(), a(Q, this).indexOf(t);
   }
   clear() {
-    return O(le, this, []), O(X, this, []), O(Q, this, []), this.size = 0, this;
+    return O(le, this, []), O($, this, []), O(Q, this, []), this.size = 0, this;
   }
   /**
    * @param {string|number} id
@@ -2633,26 +2633,26 @@ class fi {
    * @returns {CSLCitationStorage}
    */
   addCslCitation(t) {
-    return a(X, this).push(t), t.setNoteIndex(a(X, this).length), t.getCitationItems().forEach((i) => {
+    return a($, this).push(t), t.setNoteIndex(a($, this).length), t.getCitationItems().forEach((i) => {
       u(Tt, this, pi).call(this, i.id, i);
     }), this;
   }
   getAllCitationsInJson() {
-    return a(X, this).map((t) => t.toJSON());
+    return a($, this).map((t) => t.toJSON());
   }
   /**
    * @param {string} id
    * @returns {CSLCitation|undefined}
    */
   getCitation(t) {
-    return a(X, this).find((i) => i.citationID === t);
+    return a($, this).find((i) => i.citationID === t);
   }
   /**
    * @param {string} id
    * @returns {number}
    */
   getCitationIndex(t) {
-    return a(X, this).findIndex((i) => i.citationID === t);
+    return a($, this).findIndex((i) => i.citationID === t);
   }
   /**
    * @param {string} id
@@ -2660,15 +2660,15 @@ class fi {
    */
   getCitationsPre(t) {
     var i = [];
-    return a(X, this).find((n, s) => n.citationID === t ? !0 : (i.push([n.citationID, s + 1]), !1)), i;
+    return a($, this).find((n, s) => n.citationID === t ? !0 : (i.push([n.citationID, s + 1]), !1)), i;
   }
   /**
    * @param {string} id
    * @returns {Array<[string, number]>}
    */
   getCitationsPost(t) {
-    for (var i = [], n = this.getCitationIndex(t), s = n + 1; s < a(X, this).length; s++) {
-      var r = a(X, this)[s];
+    for (var i = [], n = this.getCitationIndex(t), s = n + 1; s < a($, this).length; s++) {
+      var r = a($, this)[s];
       i.push([r.citationID, s + 1]);
     }
     return i;
@@ -4369,7 +4369,7 @@ U.prototype._showLoader = function() {
 U.prototype._hideLoader = function() {
   this._cancelBtn.enable(), this._saveBtn.enable(), this._styleSelect.enable(), this._languageSelect.enable();
 };
-var Mt = "XPbozfRNSyo72orH", Li = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
+var Mt = "26014", Li = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
 class Ai {
   /**
    * @param {Router} router
@@ -4398,7 +4398,7 @@ class Ai {
   }
   init() {
     var t = this;
-    $.info("LOGIN_INIT", {
+    X.info("LOGIN_INIT", {
       message: "Initializing Mendeley Login Page"
     }), this._addEventListeners(), this._mendAppId = localStorage.getItem("mendAppId") || Mt, this._appIdField.setValue(this._mendAppId);
     var i = {
@@ -4415,7 +4415,7 @@ class Ai {
         return t._onAuthorized = r, i;
       }
     }, n = this._getToken();
-    return n ? ($.info("LOGIN_CACHED_TOKEN_FOUND", {
+    return n ? (X.info("LOGIN_CACHED_TOKEN_FOUND", {
       hasToken: !0,
       isDemo: n === "DEMO_MODE_TOKEN"
     }), t._hide(), Promise.resolve().then(() => {
@@ -4429,12 +4429,12 @@ class Ai {
    * @param {string} [state]
    */
   onAuthCallback(t, i) {
-    return i ? i != this._loginStateHash ? ($.error("CSRF_STATE_MISMATCH", {
+    return i ? i != this._loginStateHash ? (X.error("CSRF_STATE_MISMATCH", {
       expected: this._loginStateHash,
       received: i
-    }), this._loginMessage.show(m("State validation failed. Possible CSRF attack.")), !1) : (this._saveToken(t), $.success("AUTH_CALLBACK_SUCCESS", {
+    }), this._loginMessage.show(m("State validation failed. Possible CSRF attack.")), !1) : (this._saveToken(t), X.success("AUTH_CALLBACK_SUCCESS", {
       message: "Successfully authorized via callback"
-    }), this._onAuthorized(), this._hideLoader(), this._hide(), !0) : ($.warn("AUTH_CALLBACK_ERROR", {
+    }), this._onAuthorized(), this._hideLoader(), this._hide(), !0) : (X.warn("AUTH_CALLBACK_ERROR", {
       answer: t
     }), this._loginMessage.show(m(t)), !1);
   }
@@ -4465,13 +4465,13 @@ class Ai {
     }), this._loginBtn.subscribe(function(i) {
       i.type === "button:click" && t._authenticate();
     }), this._logoutLink.onclick = function() {
-      return $.info("USER_LOGOUT", {
+      return X.info("USER_LOGOUT", {
         message: "User cleared Mendeley token"
       }), localStorage.removeItem("mendToken"), localStorage.removeItem("mendTokenExpiresAt"), t._show(), !0;
     };
   }
   _startDemoMode() {
-    $.info("START_DEMO_MODE", {
+    X.info("START_DEMO_MODE", {
       message: "Activating offline demonstration library mode"
     }), this._saveToken("DEMO_MODE_TOKEN"), this._hide(), this._onAuthorized();
   }
@@ -4486,7 +4486,7 @@ class Ai {
       var n = i.match(/access_token=([^&]+)/);
       n && n[1] && (i = n[1]);
     }
-    $.info("MANUAL_TOKEN_SUBMITTED", {
+    X.info("MANUAL_TOKEN_SUBMITTED", {
       tokenLength: i.length
     }), this._saveToken(i), this._hide(), this._onAuthorized();
   }
@@ -4494,7 +4494,7 @@ class Ai {
     var t = this._appIdField.getValue().trim() || Mt;
     this._mendAppId = t, localStorage.setItem("mendAppId", t), this._loginStateHash = (/* @__PURE__ */ new Date()).getTime().toString();
     var i = "https://api.mendeley.com/oauth/authorize?client_id=" + this._mendAppId + "&redirect_uri=" + encodeURIComponent(Li) + "&response_type=token&scope=all&state=" + this._loginStateHash;
-    $.info("OPENING_BROWSER_AUTH", {
+    X.info("OPENING_BROWSER_AUTH", {
       link: i,
       appId: this._mendAppId
     }), window.open(i, "_blank", "width=600,height=750");
@@ -4877,7 +4877,7 @@ G.prototype.count = function() {
     };
   }
   window.Asc.plugin.init = function() {
-    ce.show(), x(), t = new ke(), s = new Ai(t), i = new Xt({
+    ce.show(), x(), t = new ke(), s = new Ai(t), i = new $t({
       authFlow: s.getAuthFlow()
     }), n = new U(t, e), r = new bi(n.getLocalesManager(), n.getStyleManager());
     var f = !1;
@@ -5192,10 +5192,10 @@ G.prototype.count = function() {
     typeof f > "u" && (f = h.count()), f <= 0 ? (p.disable(), p.setText(m("Insert/Edit Citation"))) : (!l && p.enable(), f > 1 ? p.setText(m("Insert " + f + " Citations")) : p.setText(m("Insert/Edit Citation")));
   }
   function Wt() {
-    return Xe.apply(this, arguments);
+    return $e.apply(this, arguments);
   }
-  function Xe() {
-    return Xe = L(function* () {
+  function $e() {
+    return $e = L(function* () {
       try {
         var f = yield new Promise((v) => {
           Asc.plugin.executeMethod("GetVersion", [], v);
@@ -5206,7 +5206,7 @@ G.prototype.count = function() {
       } catch (v) {
         return console.error(v), 99999999;
       }
-    }), Xe.apply(this, arguments);
+    }), $e.apply(this, arguments);
   }
   function zt() {
     var f = new Asc.ButtonContextMenu();
@@ -5216,10 +5216,10 @@ G.prototype.count = function() {
     })), Asc.Buttons.registerContextMenu();
   }
   function yt(f) {
-    return $e.apply(this, arguments);
+    return Xe.apply(this, arguments);
   }
-  function $e() {
-    return $e = L(function* (f) {
+  function Xe() {
+    return Xe = L(function* (f) {
       if (!f || f.indexOf("MENDELEY_CITATION") === -1)
         return r.showWarningMessage("No Mendeley citation found at the cursor. Please click directly on a citation to edit it."), !1;
       var _ = yield r.showEditCitationWindow(f);
@@ -5231,7 +5231,7 @@ G.prototype.count = function() {
         var B = m("Failed to insert citation");
         return typeof I == "string" && (B += ". " + m(I)), z(B), !1;
       });
-    }), $e.apply(this, arguments);
+    }), Xe.apply(this, arguments);
   }
 })();
 //# sourceMappingURL=bundle.modern.js.map
