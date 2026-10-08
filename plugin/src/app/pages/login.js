@@ -16,6 +16,10 @@ import { InputField, Button, Message } from "../shared/components";
 import { translate } from "../services";
 import { logger } from "../services/logger-service";
 
+// Canonical Public Client ID for OnlyOffice Mendeley Integration
+const DEFAULT_CLIENT_ID = "2441";
+const DEFAULT_REDIRECT_URI = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
+
 class LoginPage {
     /**
      * @param {Router} router
@@ -33,7 +37,7 @@ class LoginPage {
         });
 
         this._getBrowserTokenBtn = new Button("getBrowserTokenBtn", {
-            variant: "secondary",
+            variant: "primary",
         });
 
         this._demoModeBtn = new Button("demoModeBtn", {
@@ -69,7 +73,7 @@ class LoginPage {
         logger.info("LOGIN_INIT", { message: "Initializing Mendeley Login Page" });
         this._addEventListeners();
 
-        this._mendAppId = localStorage.getItem("mendAppId") || "777";
+        this._mendAppId = localStorage.getItem("mendAppId") || DEFAULT_CLIENT_ID;
         this._appIdField.setValue(this._mendAppId);
 
         const triggers = {
@@ -221,22 +225,29 @@ class LoginPage {
     }
 
     _openBrowserAuth() {
-        const appId = this._appIdField.getValue().trim() || "777";
+        const appId = this._appIdField.getValue().trim() || DEFAULT_CLIENT_ID;
         this._mendAppId = appId;
         localStorage.setItem("mendAppId", appId);
 
         this._loginStateHash = new Date().getTime().toString();
-        const redirectUri = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
         const link =
             "https://api.mendeley.com/oauth/authorize?client_id=" +
             this._mendAppId +
             "&redirect_uri=" +
-            encodeURIComponent(redirectUri) +
+            encodeURIComponent(DEFAULT_REDIRECT_URI) +
             "&response_type=token&scope=all&state=" +
             this._loginStateHash;
 
         logger.info("OPENING_BROWSER_AUTH", { link, appId: this._mendAppId });
-        window.open(link, "_blank");
+        
+        // Open OAuth in default browser window
+        const wnd = window.open(link, "_blank", "width=600,height=750");
+        
+        // Focus token input for pasting when redirected
+        const tokenInput = document.getElementById("tokenField");
+        if (tokenInput) {
+            tokenInput.focus();
+        }
     }
 
     _authenticate() {
