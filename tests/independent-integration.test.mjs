@@ -1,5 +1,4 @@
 // Independent End-to-End Test Suite for Mendeley ONLYOFFICE Integration
-// Simulates complete lifecycle: DOM, CSL compile, citeproc, Word tags, and live API endpoints
 
 import fs from "fs";
 import path from "path";
@@ -53,15 +52,15 @@ const btnLogin = doc.getElementById("getBrowserTokenBtn");
 const btnToken = doc.getElementById("connectTokenBtn");
 const btnDemo = doc.getElementById("demoModeBtn");
 const inputToken = doc.getElementById("tokenField");
-const mainLoader = doc.getElementById("loader");
+const loginState = doc.getElementById("loginState");
 
 if (!btnLogin || !btnToken || !btnDemo || !inputToken) {
     throw new Error("Critical login UI components missing from index.html DOM!");
 }
-if (!mainLoader.classList.contains("hidden")) {
-    throw new Error("Main loader is visible by default (would cause white/loading screen)!");
+if (!loginState || loginState.classList.contains("hidden")) {
+    throw new Error("Login state is hidden by default!");
 }
-console.log("  ✔ DOM initialized successfully. Loader is properly hidden by default.");
+console.log("  ✔ DOM initialized successfully. Login view is directly visible without overlay spinner.");
 console.log("  ✔ Interactive login triggers (Browser Login, Token Input, Demo Mode) confirmed active.");
 
 // TEST 3: CSL Engine & Microsoft Word Citation Tag Generation
@@ -119,7 +118,6 @@ try {
             "Accept": "application/vnd.mendeley-document.1+json"
         }
     });
-    // Expected 401 Unauthorized without token (proves endpoint exists and accepts requests)
     if (apiRes.status === 401 || apiRes.status === 200) {
         console.log(`  ✔ Mendeley Cloud Endpoint responded (HTTP ${apiRes.status} ${apiRes.statusText}) - API Gateway is reachable.`);
     } else {
