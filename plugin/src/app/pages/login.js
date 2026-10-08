@@ -80,15 +80,6 @@ class LoginPage {
 
     _bindDOM() {
         const self = this;
-        const btnSignIn = document.getElementById("getBrowserTokenBtn");
-        if (btnSignIn) {
-            btnSignIn.onclick = function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                self._openInAppModalAuth();
-            };
-        }
-
         const btnDemo = document.getElementById("demoModeBtn");
         if (btnDemo) {
             btnDemo.onclick = function (e) {
@@ -115,6 +106,10 @@ class LoginPage {
         this._saveToken("DEMO_MODE_TOKEN");
         this._hide();
         this._onAuthorized();
+        // Fallback direct view switcher
+        if (typeof window.showMainView === "function") {
+            window.showMainView();
+        }
     }
 
     _openInAppModalAuth() {
@@ -124,6 +119,9 @@ class LoginPage {
             self._saveToken(token);
             self._hide();
             self._onAuthorized();
+            if (typeof window.showMainView === "function") {
+                window.showMainView();
+            }
         }, (err) => {
             console.error("Auth error:", err);
         });
@@ -141,16 +139,23 @@ class LoginPage {
         this._saveToken(cleanToken);
         this._hide();
         this._onAuthorized();
+        if (typeof window.showMainView === "function") {
+            window.showMainView();
+        }
     }
 
     _hide() {
         Loader.hide();
-        this._router.openMain();
+        if (this._router && typeof this._router.openMain === "function") {
+            this._router.openMain();
+        }
     }
 
     _show() {
         Loader.hide();
-        this._router.openLogin();
+        if (this._router && typeof this._router.openLogin === "function") {
+            this._router.openLogin();
+        }
     }
 
     _getToken() {

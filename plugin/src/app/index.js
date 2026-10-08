@@ -8,13 +8,11 @@
 
 // @ts-check
 
-/// <reference path="./types-global.js" />
-
-import { Sdk } from "./sdk";
 import { Router } from "./router";
 import { LoginPage } from "./pages/login";
 import { SettingsPage } from "./pages/settings";
-import { translate, CitationService, logger } from "./services";
+import { Sdk } from "./sdk/sdk";
+import { CitationService } from "./services/citation-service";
 import { SelectCitationsComponent } from "./shared/ui/select-citation";
 import { Button, Loader } from "./shared/components";
 import "../components.css";
@@ -22,18 +20,11 @@ import "../styles.css";
 
 (function () {
     const displayNoneClass = "hidden";
-
-    /** @type {Router} */
     let router;
-    /** @type {Sdk} */
-    let sdk;
-    /** @type {SettingsPage} */
-    let settings;
-    /** @type {CitationService} */
-    let citationService;
-    /** @type {LoginPage} */
     let loginPage;
-    /** @type {SelectCitationsComponent} */
+    let settings;
+    let sdk;
+    let citationService;
     let selectCitation;
 
     let searchInput;
@@ -53,6 +44,16 @@ import "../styles.css";
 
         selectCitation = new SelectCitationsComponent(displayNoneClass);
     }
+
+    // Direct synchronous screen switcher
+    window.showMainView = function () {
+        const loginState = document.getElementById("loginState");
+        const mainState = document.getElementById("mainState");
+        if (loginState) loginState.classList.add("hidden");
+        if (mainState) mainState.classList.remove("hidden");
+        Loader.hide();
+        loadInitialData();
+    };
 
     window.Asc.plugin.init = function () {
         initElements();
@@ -78,8 +79,7 @@ import "../styles.css";
             })
             .onAuthorized(function () {
                 Loader.hide();
-                router.openMain();
-                loadInitialData();
+                window.showMainView();
             });
     };
 
@@ -87,34 +87,46 @@ import "../styles.css";
         const libLoader = document.getElementById("libLoader");
         if (libLoader) libLoader.classList.remove("hidden");
 
-        // Load user groups
-        sdk.getUserGroups().then(groups => {
-            if (libraryGroupSelect && groups && groups.length) {
-                libraryGroupSelect.innerHTML = '<option value="all">All References</option>';
-                groups.forEach(g => {
-                    const opt = document.createElement("option");
-                    opt.value = g.id;
-                    opt.innerText = g.name;
-                    libraryGroupSelect.appendChild(opt);
-                });
-            }
-        }).catch(e => console.warn(e));
+        // Load user groups safely
+        if (sdk && typeof sdk.getUserGroups === "function") {
+            sdk.getUserGroups().then(groups => {
+                if (libraryGroupSelect && groups && groups.length) {
+                    libraryGroupSelect.innerHTML = '<option value="all">All References</option>';
+                    groups.forEach(g => {
+                        const opt = document.createElement("option");
+                        opt.value = g.id;
+                        opt.innerText = g.name;
+                        libraryGroupSelect.appendChild(opt);
+                    });
+                }
+            }).catch(e => console.warn("Load groups warning:", e));
+        }
 
-        // Initialize settings
-        settings.init().catch(e => console.warn(e));
+        // Initialize settings safely
+        if (settings && typeof settings.init === "function") {
+            settings.init().catch(e => console.warn("Settings init warning:", e));
+        }
 
         // Load reference documents
-        sdk.getItems(null).then(res => {
-            selectCitation.clearLibrary();
-            selectCitation.displaySearchItems(res, null, null);
-        }).catch(e => {
-            console.error("Load library error:", e);
-        }).finally(() => {
+        if (sdk && typeof sdk.getItems === "function") {
+            sdk.getItems(null).then(res => {
+                if (selectCitation) {
+                    selectCitation.clearLibrary();
+                    selectCitation.displaySearchItems(res, null, null);
+                }
+            }).catch(e => {
+                console.error("Load library error:", e);
+            }).finally(() => {
+                if (libLoader) libLoader.classList.add("hidden");
+            });
+        } else {
             if (libLoader) libLoader.classList.add("hidden");
-        });
+        }
     }
 
     function addEventListeners() {
+        if (!selectCitation) return;
+
         // Selection change listener
         selectCitation.subscribe((count, selectedItems) => {
             if (insertLinkBtn) {
@@ -123,7 +135,24 @@ import "../styles.css";
             }
         });
 
-        // Search listener
+        // Insert citation button
+        if (insertLinkBtn) {
+            insertLinkBtn.addEventListener("click", () => {
+                const selected = selectCitation.getSelectedItems();
+                if (selected && selected.length) {
+                    citationService.insertCitation(selected);
+                }
+            });
+        }
+
+        // Cancel selection button
+        if (cancelSelectBtn) {
+            cancelSelectBtn.addEventListener("click", () => {
+                selectCitation.clearSelected();
+            });
+        }
+
+        // Search input
         if (searchInput) {
             let searchTimeout;
             searchInput.addEventListener("input", (e) => {
@@ -136,12 +165,11 @@ import "../styles.css";
 
                     const groupId = libraryGroupSelect ? libraryGroupSelect.value : "all";
                     const promise = groupId && groupId !== "all" ? sdk.getGroupItems(query, groupId) : sdk.getItems(query);
-
                     promise.then(res => {
                         selectCitation.clearLibrary();
-                        selectCitation.displaySearchItems(res, null, null);
-                    }).catch(err => {
-                        console.error("Search error:", err);
+                        selectCitation.displaySearchItems(res, null, query);
+                    }).catch(e => {
+                        console.error("Search error:", e);
                     }).finally(() => {
                         if (libLoader) libLoader.classList.add("hidden");
                     });
@@ -149,7 +177,7 @@ import "../styles.css";
             });
         }
 
-        // Library Group change listener
+        // Library group dropdown change
         if (libraryGroupSelect) {
             libraryGroupSelect.addEventListener("change", (e) => {
                 // @ts-ignore
@@ -161,14 +189,16 @@ import "../styles.css";
                 const promise = groupId && groupId !== "all" ? sdk.getGroupItems(query, groupId) : sdk.getItems(query);
                 promise.then(res => {
                     selectCitation.clearLibrary();
-                    selectCitation.displaySearchItems(res, null, null);
+                    selectCitation.displaySearchItems(res, null, query);
+                }).catch(e => {
+                    console.error("Group change error:", e);
                 }).finally(() => {
                     if (libLoader) libLoader.classList.add("hidden");
                 });
             });
         }
 
-        // Top More Menu Dropdown
+        // More dropdown toggle
         if (moreMenuBtn && moreDropdown) {
             moreMenuBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
@@ -180,78 +210,48 @@ import "../styles.css";
             });
         }
 
-        // Menu: Insert Bibliography
-        document.getElementById("menuInsertBib")?.addEventListener("click", () => {
-            moreDropdown?.classList.add("hidden");
-            citationService.insertBibliography();
-        });
-
-        // Menu: Refresh References
-        document.getElementById("menuRefresh")?.addEventListener("click", () => {
-            moreDropdown?.classList.add("hidden");
-            citationService.updateCslItems(true);
-            loadInitialData();
-        });
-
-        // Menu: Citation Style Settings
-        document.getElementById("menuSettings")?.addEventListener("click", () => {
-            moreDropdown?.classList.add("hidden");
-            settings.show();
-        });
-
-        document.getElementById("settingsBackBtn")?.addEventListener("click", () => {
-            router.openMain();
-        });
-
-        // Menu: Unlink Citations
-        document.getElementById("menuUnlink")?.addEventListener("click", () => {
-            moreDropdown?.classList.add("hidden");
-            citationService.saveAsText();
-        });
-
-        // Bottom Dock: Insert Citation Button
-        if (insertLinkBtn) {
-            insertLinkBtn.addEventListener("click", () => {
-                const selectedItems = selectCitation.getSelectedItems();
-                if (Object.keys(selectedItems).length === 0) return;
-
-                citationService.insertSelectedCitations(selectedItems).then(() => {
-                    selectCitation.clearSelection();
-                }).catch(err => {
-                    console.error("Insert citation error:", err);
-                });
+        // Insert Bibliography from menu
+        const menuInsertBib = document.getElementById("menuInsertBib");
+        if (menuInsertBib) {
+            menuInsertBib.addEventListener("click", () => {
+                if (moreDropdown) moreDropdown.classList.add("hidden");
+                citationService.insertBibliography();
             });
         }
 
-        // Bottom Dock: Cancel Button
-        if (cancelSelectBtn) {
-            cancelSelectBtn.addEventListener("click", () => {
-                selectCitation.clearSelection();
+        // Refresh references from menu
+        const menuRefresh = document.getElementById("menuRefresh");
+        if (menuRefresh) {
+            menuRefresh.addEventListener("click", () => {
+                if (moreDropdown) moreDropdown.classList.add("hidden");
+                citationService.refreshCitations();
             });
         }
 
-        // Inline Quick Insert Custom Event (from arrow-down format menu)
-        window.addEventListener("mendeley:quickInsert", (e) => {
-            // @ts-ignore
-            const { item, format } = e.detail || {};
-            if (!item) return;
-
-            const singleSelection = { [item.id]: item };
-            
-            // Apply formatting override if narrative
-            if (format === "narrative") {
-                item["suppress-author"] = false;
-            }
-
-            citationService.insertSelectedCitations(singleSelection).catch(err => {
-                console.error("Quick insert citation error:", err);
+        // Settings from menu
+        const menuSettings = document.getElementById("menuSettings");
+        if (menuSettings) {
+            menuSettings.addEventListener("click", () => {
+                if (moreDropdown) moreDropdown.classList.add("hidden");
+                if (router) router.openSettings();
             });
-        });
+        }
+
+        // Settings back button
+        const settingsBackBtn = document.getElementById("settingsBackBtn");
+        if (settingsBackBtn) {
+            settingsBackBtn.addEventListener("click", () => {
+                if (router) router.openMain();
+            });
+        }
+
+        // Unlink citations
+        const menuUnlink = document.getElementById("menuUnlink");
+        if (menuUnlink) {
+            menuUnlink.addEventListener("click", () => {
+                if (moreDropdown) moreDropdown.classList.add("hidden");
+                citationService.saveAsText();
+            });
+        }
     }
-
-    // Context menu and editor command handlers
-    window.Asc.plugin.button = function (id) {
-        this.executeCommand("close", "");
-    };
-
 })();

@@ -109,11 +109,27 @@
                     <div id="styleLangList"></div>
                     <div id="langMessage"></div>
                 </div>
-                <button id="settingsBackBtn" style="margin-top: 20px; width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; cursor: pointer;">Back to References</button>
+
+                <div id="notesStyle" class="notesStyle hidden" style="margin-top: 12px;">
+                    <span>Display citations as:</span>
+                    <div>
+                        <input type="radio" id="footNotes" value="footnotes" name="notesAs" />
+                        <input type="radio" id="endNotes" value="endnotes" name="notesAs" />
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 8px;">
+                    <button id="saveSettingsBtn" style="flex: 1; padding: 8px; border-radius: 6px; background: #d32f2f; color: white; border: none; cursor: pointer;">Done</button>
+                    <button id="cancelBtn" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #ccc; background: white; cursor: pointer;">Cancel</button>
+                </div>
+                <button id="settingsBackBtn" style="margin-top: 8px; width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; background: white; cursor: pointer;">Back to References</button>
             </div>
 
         </div>
     </div>
+
+    <!-- Hidden file input required by CSL file upload -->
+    <input type="file" id="cslFileInput" accept=".csl,.xml" style="display: none;" />
 
     <!-- Scripts -->
     <script src="vendor/v1/plugins.js"></script>

@@ -32,41 +32,27 @@ window.open = (url) => {
 
 // 1. Check Initial DOM Elements
 console.log("[STEP 1] Inspecting initial DOM state...");
-const btnSignIn = document.getElementById("getBrowserTokenBtn");
+const btnBrowserLink = document.getElementById("browserAuthLink");
 const btnDemo = document.getElementById("demoModeBtn");
 const btnConnect = document.getElementById("connectTokenBtn");
 const tokenInput = document.getElementById("tokenField");
 const loginState = document.getElementById("loginState");
 const mainState = document.getElementById("mainState");
 
-if (!btnSignIn || !btnDemo || !btnConnect || !tokenInput) {
+if (!btnBrowserLink || !btnDemo || !btnConnect || !tokenInput) {
     throw new Error("Interactive buttons not found in DOM!");
 }
-console.log("  ✔ All 3 action buttons (Sign In, Try Demo, Connect Token) exist.");
+console.log("  ✔ All action elements (Browser Auth Link, Try Demo, Connect Token) exist.");
 console.log("  ✔ Initial visibility: Login State is VISIBLE, Main State is HIDDEN.");
 
-// 2. Simulate Click: "Sign In with Mendeley Account"
-console.log("\n[STEP 2] Simulating Click on: 'Sign In with Mendeley Account'...");
-
-let clickHandled = false;
-btnSignIn.onclick = (e) => {
-    clickHandled = true;
-    const authUrl = `https://api.mendeley.com/oauth/authorize?client_id=26014&redirect_uri=${encodeURIComponent("https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html")}&response_type=token&scope=all`;
-    window.open(authUrl);
-};
-
-// Trigger synthetic click event
-btnSignIn.dispatchEvent(new window.MouseEvent("click", { bubbles: true, cancelable: true }));
-
-if (!clickHandled) {
-    throw new Error("Click event was NOT captured by Sign In button!");
+// 2. Simulate Click: "Buka Login di Browser"
+console.log("\n[STEP 2] Simulating Anchor Target: 'Buka Login di Browser'...");
+const href = btnBrowserLink.getAttribute("href");
+if (!href || !href.includes("client_id=26014")) {
+    throw new Error(`Browser auth link missing valid href! Got: ${href}`);
 }
-if (!openedUrl || !openedUrl.includes("client_id=26014")) {
-    throw new Error(`Window.open was not triggered properly! Opened: ${openedUrl}`);
-}
-console.log("  ✔ Click successfully dispatched!");
-console.log("  ✔ Target URL opened correctly:");
-console.log("    ", openedUrl);
+console.log("  ✔ Target URL href verified:");
+console.log("    ", href);
 
 // 3. Simulate Click: "Try Offline Demo Mode"
 console.log("\n[STEP 3] Simulating Click on: 'Try Offline Demo Mode'...");
