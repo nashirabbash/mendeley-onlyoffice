@@ -63,6 +63,7 @@ class LoginPage {
 
         this._loginStateHash = "";
         this._mendAppId = "";
+        this._clipboardPollingInterval = null;
 
         this._onAuthorized = function () {};
         this._onOpen = function () {};
@@ -82,6 +83,20 @@ class LoginPage {
         this._appIdField.setValue(this._mendAppId);
 
         this._addEventListeners();
+
+        // Listen to cross-window storage events and window focus for auto-sync
+        window.addEventListener("storage", (e) => {
+            if (e.key === "mendToken" && e.newValue) {
+                logger.info("STORAGE_EVENT_DETECTED", { token: "token_updated" });
+                self._stopClipboardSync();
+                self._hide();
+                self._onAuthorized();
+            }
+        });
+
+        window.addEventListener("focus", () => {
+            self._checkClipboardAndStorageForToken();
+        });
 
         const triggers = {
             /**
@@ -137,6 +152,7 @@ class LoginPage {
         }
         this._saveToken(answer);
         logger.success("AUTH_CALLBACK_SUCCESS", { message: "Successfully authorized via callback" });
+        this._stopClipboardSync();
         this._onAuthorized();
         this._hideLoader();
         this._hide();
@@ -204,6 +220,7 @@ class LoginPage {
     _startDemoMode() {
         logger.info("START_DEMO_MODE", { message: "Activating offline demonstration library mode" });
         this._saveToken("DEMO_MODE_TOKEN");
+        this._stopClipboardSync();
         this._hide();
         this._onAuthorized();
     }
@@ -214,21 +231,27 @@ class LoginPage {
             this._loginMessage.show(translate("Please paste an Access Token"));
             return;
         }
-        let cleanToken = rawToken;
-        if (cleanToken.startsWith("Bearer ")) {
-            cleanToken = cleanToken.slice(7).trim();
-        }
-        if (cleanToken.includes("access_token=")) {
-            const match = cleanToken.match(/access_token=([^&]+)/);
-            if (match && match[1]) {
-                cleanToken = match[1];
-            }
-        }
+        let cleanToken = this._extractTokenFromInput(rawToken);
 
         logger.info("MANUAL_TOKEN_SUBMITTED", { tokenLength: cleanToken.length });
         this._saveToken(cleanToken);
+        this._stopClipboardSync();
         this._hide();
         this._onAuthorized();
+    }
+
+    _extractTokenFromInput(input) {
+        let clean = input.trim();
+        if (clean.startsWith("Bearer ")) {
+            clean = clean.slice(7).trim();
+        }
+        if (clean.includes("access_token=")) {
+            const match = clean.match(/access_token=([^&]+)/);
+            if (match && match[1]) {
+                clean = match[1];
+            }
+        }
+        return clean;
     }
 
     _openBrowserAuth() {
@@ -253,11 +276,50 @@ class LoginPage {
         
         // Open OAuth in default browser window
         window.open(link, "_blank", "width=600,height=750");
+
+        // Start active background detector
+        this._startClipboardAndWindowSync();
+    }
+
+    _startClipboardAndWindowSync() {
+        this._stopClipboardSync();
+        logger.info("START_CLIPBOARD_SYNC", { message: "Polling clipboard & focus for automatic token detection" });
         
-        // Focus token input for pasting when redirected
-        const tokenInput = document.getElementById("tokenField");
-        if (tokenInput) {
-            tokenInput.focus();
+        this._clipboardPollingInterval = setInterval(() => {
+            this._checkClipboardAndStorageForToken();
+        }, 1000);
+    }
+
+    _stopClipboardSync() {
+        if (this._clipboardPollingInterval) {
+            clearInterval(this._clipboardPollingInterval);
+            this._clipboardPollingInterval = null;
+        }
+    }
+
+    _checkClipboardAndStorageForToken() {
+        const stored = this._getToken();
+        if (stored) {
+            logger.success("AUTO_DETECTED_TOKEN_STORAGE", { message: "Token detected in storage" });
+            this._stopClipboardSync();
+            this._hide();
+            this._onAuthorized();
+            return;
+        }
+
+        if (navigator.clipboard && typeof navigator.clipboard.readText === "function") {
+            navigator.clipboard.readText().then((text) => {
+                if (text && (text.includes("access_token=") || (text.length > 50 && text.startsWith("MSw")))) {
+                    const token = this._extractTokenFromInput(text);
+                    if (token && token.length > 30) {
+                        logger.success("AUTO_DETECTED_TOKEN_CLIPBOARD", { message: "Auto-captured token from clipboard" });
+                        this._saveToken(token);
+                        this._stopClipboardSync();
+                        this._hide();
+                        this._onAuthorized();
+                    }
+                }
+            }).catch(() => {});
         }
     }
 
