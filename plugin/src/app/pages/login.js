@@ -73,13 +73,15 @@ class LoginPage {
         const self = this;
         logger.info("LOGIN_INIT", { message: "Initializing Mendeley Login Page" });
         
-        // Force refresh cached legacy App ID
-        const cachedAppId = localStorage.getItem("mendAppId");
-        if (!cachedAppId || cachedAppId === "777" || cachedAppId === "2441") {
-            localStorage.setItem("mendAppId", REGISTERED_APP_ID);
+        // Reset legacy or demo tokens to show clean login screen
+        const currentToken = localStorage.getItem("mendToken");
+        if (currentToken === "DEMO_MODE_TOKEN") {
+            localStorage.removeItem("mendToken");
+            localStorage.removeItem("mendTokenExpiresAt");
         }
-        
-        this._mendAppId = localStorage.getItem("mendAppId") || REGISTERED_APP_ID;
+
+        localStorage.setItem("mendAppId", REGISTERED_APP_ID);
+        this._mendAppId = REGISTERED_APP_ID;
         this._appIdField.setValue(this._mendAppId);
 
         this._addEventListeners();
@@ -117,7 +119,7 @@ class LoginPage {
 
         const existingToken = this._getToken();
         if (existingToken) {
-            logger.info("LOGIN_CACHED_TOKEN_FOUND", { hasToken: true, isDemo: existingToken === "DEMO_MODE_TOKEN" });
+            logger.info("LOGIN_CACHED_TOKEN_FOUND", { hasToken: true });
             self._hide();
             Promise.resolve().then(() => {
                 self._onAuthorized();
@@ -255,13 +257,8 @@ class LoginPage {
     }
 
     _openBrowserAuth() {
-        let appId = this._appIdField.getValue().trim();
-        if (!appId || appId === "777" || appId === "2441") {
-            appId = REGISTERED_APP_ID;
-            this._appIdField.setValue(appId);
-        }
-        this._mendAppId = appId;
-        localStorage.setItem("mendAppId", appId);
+        this._mendAppId = REGISTERED_APP_ID;
+        localStorage.setItem("mendAppId", REGISTERED_APP_ID);
 
         this._loginStateHash = new Date().getTime().toString();
         const link =
@@ -324,13 +321,8 @@ class LoginPage {
     }
 
     _authenticate() {
-        var appid = this._appIdField.getValue().trim();
-        if (!appid) {
-            appid = REGISTERED_APP_ID;
-            this._appIdField.setValue(appid);
-        }
-        this._mendAppId = appid;
-        localStorage.setItem("mendAppId", appid);
+        this._mendAppId = REGISTERED_APP_ID;
+        localStorage.setItem("mendAppId", REGISTERED_APP_ID);
         this._openBrowserAuth();
     }
 

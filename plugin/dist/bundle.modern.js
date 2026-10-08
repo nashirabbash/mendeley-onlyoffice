@@ -89,7 +89,7 @@ function wt(e, t) {
   }
   return i;
 }
-function Ae(e) {
+function Le(e) {
   for (var t = 1; t < arguments.length; t++) {
     var i = arguments[t] != null ? arguments[t] : {};
     t % 2 ? wt(Object(i), !0).forEach(function(n) {
@@ -230,26 +230,26 @@ var St = {
     return t["background-toolbar"] || (t["background-toolbar"] = "#f7f7f7"), t["text-normal"] || (t["text-normal"] = "rgb(51, 51, 51)"), t["text-secondary"] || (t["text-secondary"] = "#848484"), t["highlight-button-hover"] || (t["highlight-button-hover"] = "#e0e0e0"), t["background-normal"] || (t["background-normal"] = "white"), t["background-loader"] || (t["background-loader"] = "rgba(24, 24, 24, 0.9)"), t["highlight-button-pressed"] || (t["highlight-button-pressed"] = "#cbcbcb"), t["text-inverse"] || (t["text-inverse"] = "white"), t["border-regular-control"] || (t["border-regular-control"] = "#c0c0c0"), t["border-error"] || (t["border-error"] = "#f62211"), t["border-control-focus"] || (t["border-control-focus"] = "#848484"), t["highlight-primary-dialog-button-hover"] || (t["highlight-primary-dialog-button-hover"] = "#1c1c1c"), t["background-primary-dialog-button"] || (t["background-primary-dialog-button"] = "#444444"), t["background-toolbar-additional"] || (t["background-toolbar-additional"] = "#efefef"), t["text-tertiary"] || (t["text-tertiary"] = "#bdbdbd"), t;
   }
 };
-function ke() {
+function Ee() {
   this._states = ["mainState", "loginState", "settingsState"], this._routes = ["main", "login", "settings"], this._currentRoute = "login", this._currentRouteIndex = 1, this._containers = this._states.map(function(e) {
     var t = document.getElementById(e);
     if (!t) throw new Error("container ".concat(e, " not found"));
     return t;
   });
 }
-ke.prototype.getRoute = function() {
+Ee.prototype.getRoute = function() {
   return this._currentRoute;
 };
-ke.prototype._setCurrentRoute = function(e) {
+Ee.prototype._setCurrentRoute = function(e) {
   this._containers[this._currentRouteIndex].classList.add("hidden"), this._currentRoute = e, this._currentRouteIndex = this._routes.indexOf(e), this._containers[this._currentRouteIndex].classList.remove("hidden");
 };
-ke.prototype.openMain = function() {
+Ee.prototype.openMain = function() {
   this._setCurrentRoute("main");
 };
-ke.prototype.openLogin = function() {
+Ee.prototype.openLogin = function() {
   this._setCurrentRoute("login");
 };
-ke.prototype.openSettings = function() {
+Ee.prototype.openSettings = function() {
   this._setCurrentRoute("settings");
 };
 class be {
@@ -329,7 +329,7 @@ class be {
     }
   }
 }
-var Re = [{
+var Ue = [{
   id: "demo-doc-1",
   title: "Clean Code: A Handbook of Agile Software Craftsmanship",
   type: "book",
@@ -521,7 +521,7 @@ class Xt {
       var s = i.length > 1 && i[1] !== void 0 ? i[1] : {}, r = n._getToken();
       if (!r)
         throw new Error("No Mendeley access token available");
-      var o = Ae({
+      var o = Le({
         Authorization: "Bearer ".concat(r),
         Accept: "application/vnd.mendeley-document.1+json"
       }, s.headers || {}), l = t.startsWith("http") ? t : "".concat(Zt).concat(t);
@@ -530,7 +530,7 @@ class Xt {
       });
       var u = new AbortController(), h = setTimeout(() => u.abort(), 1e4);
       try {
-        var _ = yield fetch(l, Ae(Ae({}, s), {}, {
+        var _ = yield fetch(l, Le(Le({}, s), {}, {
           headers: o,
           signal: u.signal
         }));
@@ -563,14 +563,14 @@ class Xt {
       if (s._isDemoMode()) {
         H.info("FETCHING_DEMO_ITEMS", {
           search: t,
-          count: Re.length
+          count: Ue.length
         });
-        var r = Re;
+        var r = Ue;
         if (t) {
           var o = t.toLowerCase();
-          r = Re.filter((d) => d.title.toLowerCase().includes(o) || d.authors && d.authors.some((v) => v.last_name && v.last_name.toLowerCase().includes(o) || v.first_name && v.first_name.toLowerCase().includes(o)) || d.year && String(d.year).includes(o));
+          r = Ue.filter((d) => d.title.toLowerCase().includes(o) || d.authors && d.authors.some((v) => v.last_name && v.last_name.toLowerCase().includes(o) || v.first_name && v.first_name.toLowerCase().includes(o)) || d.year && String(d.year).includes(o));
         }
-        i && i.length && (r = Re.filter((d) => i.includes(d.id)));
+        i && i.length && (r = Ue.filter((d) => i.includes(d.id)));
         var l = JSON.parse(JSON.stringify(r));
         return l.forEach(be.transform.bind(be)), {
           items: l
@@ -992,7 +992,7 @@ ue.prototype = {
     }).join(" ");
   }
 };
-function Ne(e, t) {
+function Me(e, t) {
   if (typeof e == "string") {
     var i = document.getElementById(e);
     i instanceof HTMLElement && (e = i);
@@ -1003,8 +1003,8 @@ function Ne(e, t) {
     throw new Error("Invalid container element");
   this._options = Object.assign(this._options, t), this._isShow = !1;
 }
-Ne.prototype = {
-  constructor: Ne,
+Me.prototype = {
+  constructor: Me,
   _options: {
     type: "info",
     text: "",
@@ -1328,7 +1328,7 @@ Y.prototype = /** @lends Button.prototype */
     this._container.className = t;
   }
 };
-var k = /* @__PURE__ */ new WeakMap(), R = /* @__PURE__ */ new WeakMap(), Oe = /* @__PURE__ */ new WeakMap(), J = /* @__PURE__ */ new WeakMap(), m = /* @__PURE__ */ new WeakMap(), _e = /* @__PURE__ */ new WeakMap(), Se = /* @__PURE__ */ new WeakMap(), X = /* @__PURE__ */ new WeakSet();
+var k = /* @__PURE__ */ new WeakMap(), R = /* @__PURE__ */ new WeakMap(), Ne = /* @__PURE__ */ new WeakMap(), J = /* @__PURE__ */ new WeakMap(), m = /* @__PURE__ */ new WeakMap(), _e = /* @__PURE__ */ new WeakMap(), Ce = /* @__PURE__ */ new WeakMap(), X = /* @__PURE__ */ new WeakSet();
 class Ct {
   /**
    * Create a Radio instance
@@ -1338,7 +1338,7 @@ class Ct {
    * @throws {Error} If invalid input element
    */
   constructor(t, i) {
-    if (he(this, X), V(this, k, void 0), V(this, R, void 0), V(this, Oe, void 0), V(this, J, null), V(this, m, void 0), V(this, _e, /* @__PURE__ */ new Map()), V(this, Se, []), typeof t == "string") {
+    if (he(this, X), V(this, k, void 0), V(this, R, void 0), V(this, Ne, void 0), V(this, J, null), V(this, m, void 0), V(this, _e, /* @__PURE__ */ new Map()), V(this, Ce, []), typeof t == "string") {
       var n = document.getElementById(t);
       n instanceof HTMLInputElement && (t = n);
     }
@@ -1352,10 +1352,10 @@ class Ct {
       label: "",
       name: "",
       value: "on"
-    }, i)), c(X, this, $t).call(this), N(k, this, document.createElement("div")), N(Oe, this, document.createElement("span")), c(X, this, Qt).call(this), c(X, this, ei).call(this), c(X, this, it).call(this), !a(m, this).name)
+    }, i)), c(X, this, $t).call(this), N(k, this, document.createElement("div")), N(Ne, this, document.createElement("span")), c(X, this, Qt).call(this), c(X, this, ei).call(this), c(X, this, it).call(this), !a(m, this).name)
       throw new Error("Name attribute is required");
-    var s = xe._.get(a(m, this).name);
-    s || (s = new Array(), xe._.set(a(m, this).name, s)), s.push(this);
+    var s = Ie._.get(a(m, this).name);
+    s || (s = new Array(), Ie._.set(a(m, this).name, s)), s.push(this);
   }
   /**
    * @param {function(RadioEventType): void} callback
@@ -1363,9 +1363,9 @@ class Ct {
    */
   subscribe(t) {
     var i = this;
-    return a(Se, this).push(t), {
+    return a(Ce, this).push(t), {
       unsubscribe: function() {
-        N(Se, i, a(Se, i).filter(function(s) {
+        N(Ce, i, a(Ce, i).filter(function(s) {
           return s !== t;
         }));
       }
@@ -1381,7 +1381,7 @@ class Ct {
   check(t) {
     if (!(a(m, this).disabled || a(m, this).checked)) {
       if (a(m, this).name) {
-        var i = xe._.get(a(m, this).name);
+        var i = Ie._.get(a(m, this).name);
         i && i.forEach((n) => {
           n !== this && a(m, n).checked && n.uncheck();
         });
@@ -1413,8 +1413,8 @@ class Ct {
     };
   }
   destroy() {
-    if (N(Se, this, []), !!a(m, this).name) {
-      var t = xe._.get(a(m, this).name);
+    if (N(Ce, this, []), !!a(m, this).name) {
+      var t = Ie._.get(a(m, this).name);
       if (t) {
         var i = t.indexOf(this);
         i >= 0 && t.splice(i, 1);
@@ -1432,13 +1432,13 @@ function $t() {
 }
 function Qt() {
   var e = a(R, this).parentNode, t = document.createDocumentFragment();
-  t.appendChild(a(k, this)), a(k, this).classList.add("radio-button-container"), a(k, this).setAttribute("role", "radio"), a(k, this).setAttribute("aria-checked", String(!!a(m, this).checked)), a(k, this).setAttribute("aria-disabled", String(!!a(m, this).disabled)), a(k, this).tabIndex = a(m, this).disabled ? -1 : 0, a(Oe, this).className = "radio-visual", a(Oe, this).setAttribute("aria-hidden", "true"), a(m, this).label && (N(J, this, document.createElement("label")), a(J, this).className = "i18n radio-label", a(J, this).htmlFor = String(a(m, this).id), a(J, this).textContent = a(m, this).label), a(m, this).disabled && a(k, this).classList.add("radio--disabled"), e && e.insertBefore(t, a(R, this)), a(k, this).appendChild(a(R, this)), a(k, this).appendChild(a(Oe, this)), a(J, this) && a(k, this).appendChild(a(J, this)), c(X, this, ft).call(this);
+  t.appendChild(a(k, this)), a(k, this).classList.add("radio-button-container"), a(k, this).setAttribute("role", "radio"), a(k, this).setAttribute("aria-checked", String(!!a(m, this).checked)), a(k, this).setAttribute("aria-disabled", String(!!a(m, this).disabled)), a(k, this).tabIndex = a(m, this).disabled ? -1 : 0, a(Ne, this).className = "radio-visual", a(Ne, this).setAttribute("aria-hidden", "true"), a(m, this).label && (N(J, this, document.createElement("label")), a(J, this).className = "i18n radio-label", a(J, this).htmlFor = String(a(m, this).id), a(J, this).textContent = a(m, this).label), a(m, this).disabled && a(k, this).classList.add("radio--disabled"), e && e.insertBefore(t, a(R, this)), a(k, this).appendChild(a(R, this)), a(k, this).appendChild(a(Ne, this)), a(J, this) && a(k, this).appendChild(a(J, this)), c(X, this, ft).call(this);
 }
 function ft() {
   if (a(m, this).checked)
     a(k, this).tabIndex = a(m, this).disabled ? -1 : 0;
-  else if (a(m, this).name && xe._.has(a(m, this).name)) {
-    var e = xe._.get(a(m, this).name), t = !1;
+  else if (a(m, this).name && Ie._.has(a(m, this).name)) {
+    var e = Ie._.get(a(m, this).name), t = !1;
     e && e.forEach((i) => {
       a(m, i).checked && i !== this && (t = !0);
     }), !t && !a(m, this).checked && !a(m, this).disabled ? a(k, this).tabIndex = 0 : a(k, this).tabIndex = -1;
@@ -1471,11 +1471,11 @@ function xt(e) {
     type: "radio:change",
     detail: t
   };
-  e && (i.originalEvent = e), a(Se, this).forEach(function(n) {
+  e && (i.originalEvent = e), a(Ce, this).forEach(function(n) {
     n(i);
   });
 }
-var xe = {
+var Ie = {
   _: /* @__PURE__ */ new Map()
 };
 function Je(e, t) {
@@ -1727,14 +1727,14 @@ class ge {
           Math.abs(s.top - this._headerRectOnOpen.top) > 1 && c(L, this, te).call(this);
         }
       }
-    }, this._optionsContainer = null, this.searchInput = null, this._select = document.createElement("div"), this._header = document.createElement("div"), this._selectedText = document.createElement("span"), this._arrow = document.createElement("span"), this._dropdown = document.createElement("div"), c(L, this, ti).call(this), c(L, this, ii).call(this), c(L, this, Ie).call(this), lt._.add(this);
+    }, this._optionsContainer = null, this.searchInput = null, this._select = document.createElement("div"), this._header = document.createElement("div"), this._selectedText = document.createElement("span"), this._arrow = document.createElement("span"), this._dropdown = document.createElement("div"), c(L, this, ti).call(this), c(L, this, ii).call(this), c(L, this, Ae).call(this), lt._.add(this);
   }
   openDropdown() {
     this.isOpen || document.addEventListener("click", this._boundHandles.close), this.isOpen = !0, this._dropdown.style.display = "block", this._headerRectOnOpen = this._header.getBoundingClientRect(), document.addEventListener("scroll", this._boundHandles.scrollCheck, !0), this._arrow.className += " selectbox-arrow-open", this._header.className += " selectbox-header-open", this.searchInput && setTimeout(/* @__PURE__ */ (function(t) {
       return function() {
         t.searchInput && t.searchInput.focus();
       };
-    })(this), 100), c(L, this, Ie).call(this), c(L, this, oi).call(this);
+    })(this), 100), c(L, this, Ae).call(this), c(L, this, oi).call(this);
   }
   /**
    * @param {function(SelectboxEventType): void} callback
@@ -1785,7 +1785,7 @@ class ge {
           selected: l
         });
       }
-    }, this), this.isOpen && c(L, this, Ie).call(this), c(L, this, le).call(this);
+    }, this), this.isOpen && c(L, this, Ae).call(this), c(L, this, le).call(this);
   }
   /**
    * @param {string} value
@@ -1908,7 +1908,7 @@ class ge {
       var i = this._items[0];
       i && this._selectedValues.add(i.value);
     }
-    c(L, this, le).call(this), c(L, this, Ie).call(this);
+    c(L, this, le).call(this), c(L, this, Ae).call(this);
   }
   destroy() {
     this._subscribers = [], lt._.delete(this);
@@ -1966,7 +1966,7 @@ function ni(e) {
   var t = e.target;
   if (t instanceof HTMLInputElement) {
     var i = t.value.toLowerCase();
-    c(L, this, Ie).call(this, i);
+    c(L, this, Ae).call(this, i);
   }
 }
 function It(e) {
@@ -1999,7 +1999,7 @@ function It(e) {
       var u = (r + 1) % n.length;
       u === n.length && (u = 0), this._selectedValues.clear(), i = n[u], this._selectedValues.add(i.value);
     }
-    c(L, this, le).call(this), c(L, this, Ie).call(this, t, !0), c(L, this, qe).call(this, i.value, !0);
+    c(L, this, le).call(this), c(L, this, Ae).call(this, t, !0), c(L, this, qe).call(this, i.value, !0);
   }
 }
 function si(e) {
@@ -2027,7 +2027,7 @@ function si(e) {
       break;
   }
 }
-function Ie(e, t) {
+function Ae(e, t) {
   if (e = e || "", !!this._optionsContainer) {
     this._optionsContainer.innerHTML = "";
     var i = null, n = this._items;
@@ -2195,7 +2195,7 @@ function ai(e) {
 var lt = {
   _: /* @__PURE__ */ new Set()
 }, ie = /* @__PURE__ */ new WeakMap(), Lt = /* @__PURE__ */ new WeakSet();
-class Pe {
+class Te {
   /**
    * @param {string} containerId
    * @param {string} text
@@ -2240,14 +2240,14 @@ function w(e) {
     return console.error(t), e;
   }
 }
-var Ue = /* @__PURE__ */ new WeakMap(), se = /* @__PURE__ */ new WeakMap(), M = /* @__PURE__ */ new WeakSet();
+var Ve = /* @__PURE__ */ new WeakMap(), se = /* @__PURE__ */ new WeakMap(), M = /* @__PURE__ */ new WeakSet();
 class ci {
   /**
    * @param {string} citPrefix
    * @param {string} bibPrefix
    */
   constructor(t, i) {
-    he(this, M), V(this, Ue, void 0), V(this, se, void 0), N(Ue, this, t), N(se, this, i);
+    he(this, M), V(this, Ve, void 0), V(this, se, void 0), N(Ve, this, t), N(se, this, i);
   }
   /**
    * @param {string} text
@@ -2262,7 +2262,7 @@ class ci {
         // can edit
         PlaceHolderText: ""
       };
-      return yield c(M, i, Ve).call(i, n, 1), c(M, i, Pt).call(i, t);
+      return yield c(M, i, Ge).call(i, n, 1), c(M, i, Pt).call(i, t);
     })();
   }
   /**
@@ -2280,14 +2280,14 @@ class ci {
         // can edit
         PlaceHolderText: ""
       };
-      yield c(M, s, Ve).call(s, r);
+      yield c(M, s, Ge).call(s, r);
       var o = n && ["footnotes", "endnotes"].indexOf(n) !== -1, l = yield new Promise((u) => {
         Asc.scope.bAddNote = o, Asc.plugin.callCommand(() => {
           var h = Api.GetDocument(), _ = h.GetCurrentContentControl();
           return Asc.scope.bAddNote && (_.AddText(""), _.Select()), _.GetInternalId();
         }, !1, !1, u);
       });
-      return o && (yield c(M, s, nt).call(s, n)), yield c(M, s, Ce).call(s, t), l;
+      return o && (yield c(M, s, nt).call(s, n)), yield c(M, s, xe).call(s, t), l;
     })();
   }
   /**
@@ -2299,7 +2299,7 @@ class ci {
     return C(function* () {
       try {
         for (var n = yield c(M, i, hi).call(i), s = [], r = [], o = 0; o < n.length; o++) {
-          var l = n[o], u = l.Tag.indexOf(a(Ue, i)) !== -1, h = l.Tag.indexOf(a(se, i)) !== -1;
+          var l = n[o], u = l.Tag.indexOf(a(Ve, i)) !== -1, h = l.Tag.indexOf(a(se, i)) !== -1;
           (u || h) && (s.push(l), r.push(l.InternalId));
         }
         Asc.scope.internalIds = r, Asc.scope.useParagraph = !!t;
@@ -2382,7 +2382,7 @@ class ci {
   /** @returns {Promise<boolean>} */
   saveAsText() {
     return new Promise((t) => {
-      Asc.scope.citPrefix = a(Ue, this), Asc.scope.bibPrefix = a(se, this), window.Asc.plugin.callCommand(function() {
+      Asc.scope.citPrefix = a(Ve, this), Asc.scope.bibPrefix = a(se, this), window.Asc.plugin.callCommand(function() {
         var i = Api.GetDocument(), n = i.GetAllContentControls();
         !n || n.length === 0 || n.forEach((s) => {
           var r = s.GetTag();
@@ -2423,7 +2423,7 @@ class ci {
           }, !1, !1, T);
         }), !t[v].PlaceHolderText)
           return 0;
-        yield c(M, i, Ce).call(i, t[v].PlaceHolderText);
+        yield c(M, i, xe).call(i, t[v].PlaceHolderText);
       }, h, _ = 0; _ < t.length; _++)
         h = yield* u(_);
       return n;
@@ -2447,7 +2447,7 @@ class ci {
           // can edit
           PlaceHolderText: ""
         };
-        yield c(M, n, Ve).call(n, l), yield c(M, n, kt).call(n, r.FieldId);
+        yield c(M, n, Ge).call(n, l), yield c(M, n, kt).call(n, r.FieldId);
       }
       if (i) {
         yield c(M, n, Et).call(n, i.FieldId);
@@ -2457,7 +2457,7 @@ class ci {
           // can edit
           PlaceHolderText: ""
         };
-        yield c(M, n, Ve).call(n, u, 1), yield c(M, n, kt).call(n, i.FieldId);
+        yield c(M, n, Ge).call(n, u, 1), yield c(M, n, kt).call(n, i.FieldId);
       }
     })();
   }
@@ -2482,7 +2482,7 @@ class ci {
           }, !1, !1, _);
         }), yield c(M, i, st).call(i);
         var h = l.PlaceHolderText;
-        yield c(M, i, Ce).call(i, h);
+        yield c(M, i, xe).call(i, h);
       }, s, r = 0; r < t.length; r++)
         s = yield* n();
     })();
@@ -2507,7 +2507,7 @@ class ci {
           }, !1, !1, d);
         }), yield c(M, n, st).call(n), yield c(M, n, nt).call(n, i);
         var _ = u.PlaceHolderText;
-        yield c(M, n, Ce).call(n, _);
+        yield c(M, n, xe).call(n, _);
       }, r, o = 0; o < t.length; o++)
         r = yield* s();
     })();
@@ -2532,7 +2532,7 @@ class ci {
             var d = Api.GetDocument(), v = d.GetCurrentContentControl();
             v ? v.SetTag(Asc.scope.tag) : console.error("Can not find content control");
           }, !1, !1, _);
-        }), u.PlaceHolderText && (yield c(M, n, st).call(n), yield c(M, n, nt).call(n, i), yield c(M, n, Ce).call(n, u.PlaceHolderText));
+        }), u.PlaceHolderText && (yield c(M, n, st).call(n), yield c(M, n, nt).call(n, i), yield c(M, n, xe).call(n, u.PlaceHolderText));
       }, r, o = 0; o < t.length; o++)
         r = yield* s();
     })();
@@ -2552,7 +2552,7 @@ class ci {
     })();
   }
 }
-function Ve(e, t) {
+function Ge(e, t) {
   return new Promise(function(i) {
     typeof t != "number" && (t = 2), window.Asc.plugin.executeMethod("AddContentControl", [t, e], i);
   });
@@ -2575,7 +2575,7 @@ function hi() {
     window.Asc.plugin.executeMethod("GetAllContentControls", void 0, e);
   });
 }
-function Ce(e) {
+function xe(e) {
   return new Promise(function(t) {
     window.Asc.plugin.executeMethod("PasteHtml", [e], t);
   });
@@ -2625,7 +2625,7 @@ function ct() {
         var h = document.createElement("p");
         h.innerHTML = r.innerHTML, r.parentNode.replaceChild(h, r);
       }
-    }), e = i.body.innerHTML, yield c(M, this, Ce).call(this, e), new Promise((r) => {
+    }), e = i.body.innerHTML, yield c(M, this, xe).call(this, e), new Promise((r) => {
       var o = !0, l = !1;
       Asc.scope.numbers = s, Asc.plugin.callCommand(() => {
         var u = Api.GetDocument(), h = u.GetCurrentContentControl(), _ = h.GetRange(0, Number.MAX_SAFE_INTEGER);
@@ -3146,7 +3146,7 @@ K.prototype.toFlatJSON = function(e) {
   return Object.assign(t, i), typeof this._itemData.getCustomProperty("userID") < "u" && this._itemData.getCustomProperty("userID") !== null && (t.userID = String(this._itemData.getCustomProperty("userID"))), typeof this._itemData.getCustomProperty("groupID") < "u" && this._itemData.getCustomProperty("groupID") !== null && (t.groupID = String(this._itemData.getCustomProperty("groupID"))), t;
 };
 var z = /* @__PURE__ */ new WeakSet();
-class Le {
+class ke {
   /** @param {string} [citationID] */
   constructor(t) {
     he(this, z), t || (t = c(z, this, Ot).call(this)), ot._.has(t) && (console.warn("Citation ID must be unique"), t = c(z, this, Ot).call(this)), ot._.add(t), this.citationID = t, this._citationItems = new Array(), this._properties = {}, this._manualOverride = {}, this._schema = "https://raw.githubusercontent.com/citation-style-language/schema/master/schemas/input/csl-citation.json";
@@ -3306,10 +3306,10 @@ function Ot() {
 }
 var ot = {
   _: /* @__PURE__ */ new Set()
-}, B = /* @__PURE__ */ new WeakMap(), Ye = /* @__PURE__ */ new WeakMap(), Me = /* @__PURE__ */ new WeakMap(), je = /* @__PURE__ */ new WeakMap(), ee = /* @__PURE__ */ new WeakSet();
+}, B = /* @__PURE__ */ new WeakMap(), Ye = /* @__PURE__ */ new WeakMap(), Fe = /* @__PURE__ */ new WeakMap(), je = /* @__PURE__ */ new WeakMap(), ee = /* @__PURE__ */ new WeakSet();
 class mi {
   constructor() {
-    he(this, ee), V(this, B, void 0), V(this, Ye, void 0), V(this, Me, void 0), V(this, je, void 0), N(B, this, null), N(Ye, this, window.Asc.plugin.button), N(Me, this, Asc.plugin.onThemeChanged), N(je, this, Asc.plugin.onTranslate);
+    he(this, ee), V(this, B, void 0), V(this, Ye, void 0), V(this, Fe, void 0), V(this, je, void 0), N(B, this, null), N(Ye, this, window.Asc.plugin.button), N(Fe, this, Asc.plugin.onThemeChanged), N(je, this, Asc.plugin.onTranslate);
   }
   /**
    * @param {string} description
@@ -3419,9 +3419,9 @@ class mi {
   }
 }
 function at(e, t, i) {
-  a(B, this) && (N(Ye, this, window.Asc.plugin.button), N(Me, this, Asc.plugin.onThemeChanged), N(je, this, Asc.plugin.onTranslate), window.Asc.plugin.onThemeChanged = (n) => {
+  a(B, this) && (N(Ye, this, window.Asc.plugin.button), N(Fe, this, Asc.plugin.onThemeChanged), N(je, this, Asc.plugin.onTranslate), window.Asc.plugin.onThemeChanged = (n) => {
     var s;
-    (s = a(B, this)) === null || s === void 0 || s.command("onThemeChanged", n), a(Me, this).call(this, n);
+    (s = a(B, this)) === null || s === void 0 || s.command("onThemeChanged", n), a(Fe, this).call(this, n);
   }, window.Asc.plugin.onTranslate = () => {
     var n;
     (n = a(B, this)) === null || n === void 0 || n.command("onTranslate"), a(je, this).call(this);
@@ -3443,7 +3443,7 @@ function at(e, t, i) {
   }));
 }
 function we() {
-  a(B, this) && (a(B, this).close(), N(B, this, null)), window.Asc.plugin.button = a(Ye, this), window.Asc.plugin.onThemeChanged = a(Me, this);
+  a(B, this) && (a(B, this).close(), N(B, this, null)), window.Asc.plugin.button = a(Ye, this), window.Asc.plugin.onThemeChanged = a(Fe, this);
 }
 var ae = /* @__PURE__ */ new WeakMap(), x = /* @__PURE__ */ new WeakSet();
 class bi {
@@ -3489,7 +3489,7 @@ class bi {
       } catch (o) {
         throw o;
       }
-      var n = new Le("");
+      var n = new ke("");
       for (var s in t) {
         var r = t[s];
         n.fillFromObject(r);
@@ -3508,7 +3508,7 @@ class bi {
       var s, r = c(x, n, Ke).call(n, i);
       if (typeof r != "object" || !Object.hasOwn(r, "citationID"))
         throw new Error("Invalid control tag");
-      var o = r.citationID, l = new Le("");
+      var o = r.citationID, l = new ke("");
       l.fillFromObject(r);
       for (var u in t) {
         var h = t[u];
@@ -3535,7 +3535,7 @@ class bi {
           bibControl: n
         } = yield c(x, t, re).call(t), s = i.length === 0;
         if (c(x, t, oe).call(t), n) {
-          var r, o = [yield c(x, t, Ge).call(t, s, n)], l = yield t.citationDocService.updateContentControls(o);
+          var r, o = [yield c(x, t, We).call(t, s, n)], l = yield t.citationDocService.updateContentControls(o);
           return (r = l[0]) !== null && r !== void 0 ? r : "";
         } else
           return c(x, t, xi).call(t, s);
@@ -3572,7 +3572,7 @@ class bi {
           var l = i._cslStylesManager.getLastUsedFormat();
           l === "numeric" && (t = !0);
         }
-        if (typeof t == "boolean" && (o = yield c(x, i, Te).call(i, n, t)), s && o.push(yield c(x, i, Ge).call(i, r, s)), o && o.length)
+        if (typeof t == "boolean" && (o = yield c(x, i, Oe).call(i, n, t)), s && o.push(yield c(x, i, We).call(i, r, s)), o && o.length)
           return i.citationDocService.updateContentControls(o);
       } catch (u) {
         throw u;
@@ -3591,10 +3591,10 @@ class bi {
           controlsWithCitations: n,
           bibControl: s
         } = yield c(x, i, re).call(i), r = n.length === 0;
-        c(x, i, oe).call(i), yield c(x, i, We).call(i, n, t);
-        var o = yield c(x, i, Te).call(i, n, !1);
+        c(x, i, oe).call(i), yield c(x, i, De).call(i, n, t);
+        var o = yield c(x, i, Oe).call(i, n, !1);
         if (o && o.length && (yield i.citationDocService.convertNotesStyle(o, t)), s) {
-          var l = [yield c(x, i, Ge).call(i, r, s)];
+          var l = [yield c(x, i, We).call(i, r, s)];
           yield i.citationDocService.updateContentControls(l);
         }
       } catch (u) {
@@ -3618,8 +3618,8 @@ class bi {
         } = yield c(x, n, re).call(n, t, t.citationID), o = s.length === 0;
         c(x, n, oe).call(n), t && (s = s.filter(function(u) {
           return u.cslCitation.citationID === t.citationID;
-        })), i && (yield c(x, n, We).call(n, s, i));
-        var l = yield c(x, n, Te).call(n, s, !0);
+        })), i && (yield c(x, n, De).call(n, s, i));
+        var l = yield c(x, n, Oe).call(n, s, !0);
         if (i && l && l.length && (yield n.citationDocService.convertNotesStyle(l, i), l = []), l && l.length)
           return n.citationDocService.updateContentControls(l);
       } catch (u) {
@@ -3640,10 +3640,10 @@ class bi {
           controlsWithCitations: s,
           bibControl: r
         } = yield c(x, n, re).call(n), o = s.length === 0;
-        c(x, n, oe).call(n), i && (yield c(x, n, We).call(n, s, i));
-        var l = yield c(x, n, Te).call(n, s, !0);
+        c(x, n, oe).call(n), i && (yield c(x, n, De).call(n, s, i));
+        var l = yield c(x, n, Oe).call(n, s, !0);
         if (l && l.length && (t ? yield n.citationDocService.convertTextToNotes(l, t) : i && (yield n.citationDocService.convertNotesToText(l))), r) {
-          var u = [yield c(x, n, Ge).call(n, o, r)];
+          var u = [yield c(x, n, We).call(n, o, r)];
           yield n.citationDocService.updateContentControls(u);
         }
       } catch (h) {
@@ -3663,8 +3663,8 @@ class bi {
         var {
           controlsWithCitations: s
         } = yield c(x, n, re).call(n, void 0, void 0, t);
-        c(x, n, oe).call(n), yield c(x, n, We).call(n, s, i);
-        var r = yield c(x, n, Te).call(n, s, !1, !0);
+        c(x, n, oe).call(n), yield c(x, n, De).call(n, s, i);
+        var r = yield c(x, n, Oe).call(n, s, !1, !0);
         if (!r || !r.length) return;
         yield n.citationDocService.convertNotesStyle(r, t);
       } catch (o) {
@@ -3810,15 +3810,15 @@ function Ci(e) {
 }
 function re(e, t, i) {
   var n = this;
-  return this._storage.clear(), Le.resetUsedIDs(), this.citationDocService.getAddinMendeleyControls(i).then(function(s) {
+  return this._storage.clear(), ke.resetUsedIDs(), this.citationDocService.getAddinMendeleyControls(i).then(function(s) {
     var r = s.find(function(u) {
       return u.Tag.indexOf(n._bibPrefixNew) !== -1;
     }), o = s.filter(function(u) {
       return u.Tag.indexOf(n._citPrefixNew) !== -1;
     }), l = o.map(function(u) {
-      var h = c(x, n, Ke).call(n, u.Tag), _ = h.citationID || "", d = new Le(_);
+      var h = c(x, n, Ke).call(n, u.Tag), _ = h.citationID || "", d = new ke(_);
       return e && t === _ ? d.fillFromObject(e) : d.fillFromObject(h), n._storage.addCslCitation(d), {
-        control: Ae({}, u),
+        control: Le({}, u),
         cslCitation: d
       };
     });
@@ -3846,7 +3846,7 @@ function Ze(e) {
     }));
   return this._citPrefixNew + "_v3_" + t;
 }
-function Ge(e, t) {
+function We(e, t) {
   if (e)
     t.PlaceHolderText = w(this._bibPlaceholderIfEmpty);
   else {
@@ -3855,7 +3855,7 @@ function Ge(e, t) {
   }
   return t;
 }
-function Te(e, t, i) {
+function Oe(e, t, i) {
   return ut.apply(this, arguments);
 }
 function ut() {
@@ -3908,7 +3908,7 @@ function oe() {
 function _t(e) {
   return e.replace(/\u00A0/g, " ").replace(/&#60;/g, "<").replace(/&#62;/g, ">").replace(/&#38;/g, "&");
 }
-function We(e, t) {
+function De(e, t) {
   return ht.apply(this, arguments);
 }
 function ht() {
@@ -3925,7 +3925,7 @@ function Ii(e) {
 function dt() {
   return dt = C(function* (e) {
     var t = this;
-    this._storage.clear(), Le.resetUsedIDs();
+    this._storage.clear(), ke.resetUsedIDs();
     var i = e.find((s) => s.Value.indexOf("Mendeley Bibliography") === 0), n = e.filter((s) => !i || i.FieldId !== s.FieldId).map((s) => {
       var r = c(x, this, Ci).call(this, s);
       r && r.citationItems && r.citationItems.forEach(function(l) {
@@ -3943,9 +3943,9 @@ function dt() {
           ), l.id = u, l.itemData.id = u;
         }
       });
-      var o = new Le();
+      var o = new ke();
       return o.fillFromObject(r), o.setManualOverride(s.Content), t._storage.addCslCitation(o), {
-        field: Ae({}, s),
+        field: Le({}, s),
         cslCitation: o
       };
     });
@@ -3986,7 +3986,7 @@ class Nt {
     });
   }
 }
-var Fe = {
+var Be = {
   /**
    * Parse a style object to extract relevant information.
    * @param {string} name
@@ -4073,14 +4073,14 @@ ve.prototype.getStyle = function(e) {
 };
 ve.prototype.getStylesInfo = function() {
   for (var e = this.getStyleNames(), t = this._getStyles(), i = [], n = 0; n < e.length; n++) {
-    var s = Fe.getStyleInfo(e[n], t[n]);
+    var s = Be.getStyleInfo(e[n], t[n]);
     i.push(s);
   }
   return i;
 };
 ve.prototype.setStyle = function(e, t) {
   var i = this.getStyleNames(), n = this._getStyles(), s = i.indexOf(e);
-  return s === -1 && (s = i.length), i[s] = e, n[s] = t, localStorage.setItem(this._customStyleNamesKey, JSON.stringify(i)), localStorage.setItem(this._customStylesKey, JSON.stringify(n)), Fe.getStyleInfo(e, t);
+  return s === -1 && (s = i.length), i[s] = e, n[s] = t, localStorage.setItem(this._customStyleNamesKey, JSON.stringify(i)), localStorage.setItem(this._customStylesKey, JSON.stringify(n)), Be.getStyleInfo(e, t);
 };
 ve.prototype.deleteStyle = function(e) {
   var t = this.getStyleNames(), i = this._getStyles(), n = t.indexOf(e);
@@ -4142,7 +4142,7 @@ G.prototype.getStyle = function(e) {
     });
   }).then(function(n) {
     if (n && !i._isValidCSL(n) && i._isOnlineAvailable) {
-      var s = Fe.getStyleInfo(e, n);
+      var s = Be.getStyleInfo(e, n);
       if (s && s.dependent > 0 && s.parent)
         return fetch(s.parent).then(function(r) {
           return r.text();
@@ -4150,7 +4150,7 @@ G.prototype.getStyle = function(e) {
     }
     return n;
   }).then(function(n) {
-    var s = n && Fe.getCitationFormat(n) || "numeric", r = {
+    var s = n && Be.getCitationFormat(n) || "numeric", r = {
       content: n,
       styleFormat: s
     };
@@ -4207,7 +4207,7 @@ G.prototype._readCSLFile = function(e) {
 };
 G.prototype._saveLastUsedStyle = function(e, t, i) {
   this._cache[e] = t, localStorage.setItem(this._lastStyleKey, e), localStorage.setItem(this._lastFormatKey, i);
-  var n = Fe.isStyleContainBibliography(t);
+  var n = Be.isStyleContainBibliography(t);
   localStorage.setItem(this._lastUsedStyleContainBibliographyKey, n.toString());
 };
 G.prototype.saveLastUsedNotesStyle = function(e) {
@@ -4275,9 +4275,9 @@ function U(e, t) {
   this._languageSelect = new ge("styleLangList", {
     placeholder: "Select language"
   }), this._cslStylesManager = new G("mendStyleId"), this._localesManager = new de(), this._selectLists = [], this._onChangeState = function(i, n) {
-  }, this._styleMessage = new Ne("styleMessage", {
+  }, this._styleMessage = new Me("styleMessage", {
     type: "error"
-  }), this._langMessage = new Ne("langMessage", {
+  }), this._langMessage = new Me("langMessage", {
     type: "error"
   }), this._LANGUAGES = [["af-ZA", "Afrikaans"], ["ar", "Arabic"], ["bg-BG", "Bulgarian"], ["ca-AD", "Catalan"], ["cs-CZ", "Czech"], ["cy-GB", "Welsh"], ["da-DK", "Danish"], ["de-AT", "German (Austria)"], ["de-CH", "German (Switzerland)"], ["de-DE", "German (Germany)"], ["el-GR", "Greek"], ["en-GB", "English (UK)"], ["en-US", "English (US)"], ["es-CL", "Spanish (Chile)"], ["es-ES", "Spanish (Spain)"], ["es-MX", "Spanish (Mexico)"], ["et-EE", "Estonian"], ["eu", "Basque"], ["fa-IR", "Persian"], ["fi-FI", "Finnish"], ["fr-CA", "French (Canada)"], ["fr-FR", "French (France)"], ["he-IL", "Hebrew"], ["hr-HR", "Croatian"], ["hu-HU", "Hungarian"], ["id-ID", "Indonesian"], ["is-IS", "Icelandic"], ["it-IT", "Italian"], ["ja-JP", "Japanese"], ["km-KH", "Khmer"], ["ko-KR", "Korean"], ["la", "Latin"], ["lt-LT", "Lithuanian"], ["lv-LV", "Latvian"], ["mn-MN", "Mongolian"], ["nb-NO", "Norwegian (Bokmål)"], ["nl-NL", "Dutch"], ["nn-NO", "Norwegian (Nynorsk)"], ["pl-PL", "Polish"], ["pt-BR", "Portuguese (Brazil)"], ["pt-PT", "Portuguese (Portugal)"], ["ro-RO", "Romanian"], ["ru-RU", "Russian"], ["sk-SK", "Slovak"], ["sl-SI", "Slovenian"], ["sr-RS", "Serbian"], ["sv-SE", "Swedish"], ["th-TH", "Thai"], ["tr-TR", "Turkish"], ["uk-UA", "Ukrainian"], ["vi-VN", "Vietnamese"], ["zh-CN", "Chinese (PRC)"], ["zh-TW", "Chinese (Taiwan)"]], this._bNumFormat = !1, this._stateSettings = {
     style: "",
@@ -4322,7 +4322,7 @@ U.prototype._addEventListeners = function() {
         console.error("No language selected");
         return;
       }
-      var n = Ae({}, e._stateSettings), s = [];
+      var n = Le({}, e._stateSettings), s = [];
       e._stateSettings.language !== i && (e._localesManager.saveLastUsedLanguage(i), s.push(e._localesManager.loadLocale(i).catch(function(l) {
         throw console.error(l), e._langMessage.show(w("Failed to load language")), l;
       })));
@@ -4439,7 +4439,7 @@ U.prototype._showLoader = function() {
 U.prototype._hideLoader = function() {
   this._cancelBtn.enable(), this._saveBtn.enable(), this._styleSelect.enable(), this._languageSelect.enable();
 };
-var De = "26014", Ai = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
+var Se = "26014", Ai = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
 class Li {
   /**
    * @param {Router} router
@@ -4458,7 +4458,7 @@ class Li {
       autocomplete: "on"
     }), this._loginBtn = new Y("loginBtn", {
       variant: "secondary"
-    }), this._loginMessage = new Ne("loginMessage", {
+    }), this._loginMessage = new Me("loginMessage", {
       type: "error"
     }), this._logoutLink = document.getElementById("logoutLink"), !this._logoutLink)
       throw new Error("logoutLink not found");
@@ -4471,8 +4471,8 @@ class Li {
     H.info("LOGIN_INIT", {
       message: "Initializing Mendeley Login Page"
     });
-    var i = localStorage.getItem("mendAppId");
-    (!i || i === "777" || i === "2441") && localStorage.setItem("mendAppId", De), this._mendAppId = localStorage.getItem("mendAppId") || De, this._appIdField.setValue(this._mendAppId), this._addEventListeners(), window.addEventListener("storage", (r) => {
+    var i = localStorage.getItem("mendToken");
+    i === "DEMO_MODE_TOKEN" && (localStorage.removeItem("mendToken"), localStorage.removeItem("mendTokenExpiresAt")), localStorage.setItem("mendAppId", Se), this._mendAppId = Se, this._appIdField.setValue(this._mendAppId), this._addEventListeners(), window.addEventListener("storage", (r) => {
       r.key === "mendToken" && r.newValue && (H.info("STORAGE_EVENT_DETECTED", {
         token: "token_updated"
       }), t._stopClipboardSync(), t._hide(), t._onAuthorized());
@@ -4494,8 +4494,7 @@ class Li {
       }
     }, s = this._getToken();
     return s ? (H.info("LOGIN_CACHED_TOKEN_FOUND", {
-      hasToken: !0,
-      isDemo: s === "DEMO_MODE_TOKEN"
+      hasToken: !0
     }), t._hide(), Promise.resolve().then(() => {
       t._onAuthorized();
     }), n) : (t._show(), Promise.resolve().then(() => {
@@ -4573,13 +4572,12 @@ class Li {
     return i;
   }
   _openBrowserAuth() {
-    var t = this._appIdField.getValue().trim();
-    (!t || t === "777" || t === "2441") && (t = De, this._appIdField.setValue(t)), this._mendAppId = t, localStorage.setItem("mendAppId", t), this._loginStateHash = (/* @__PURE__ */ new Date()).getTime().toString();
-    var i = "https://api.mendeley.com/oauth/authorize?client_id=" + this._mendAppId + "&redirect_uri=" + encodeURIComponent(Ai) + "&response_type=token&scope=all&state=" + this._loginStateHash;
+    this._mendAppId = Se, localStorage.setItem("mendAppId", Se), this._loginStateHash = (/* @__PURE__ */ new Date()).getTime().toString();
+    var t = "https://api.mendeley.com/oauth/authorize?client_id=" + this._mendAppId + "&redirect_uri=" + encodeURIComponent(Ai) + "&response_type=token&scope=all&state=" + this._loginStateHash;
     H.info("OPENING_BROWSER_AUTH", {
-      link: i,
+      link: t,
       appId: this._mendAppId
-    }), window.open(i, "_blank", "width=600,height=750"), this._startClipboardAndWindowSync();
+    }), window.open(t, "_blank", "width=600,height=750"), this._startClipboardAndWindowSync();
   }
   _startClipboardAndWindowSync() {
     this._stopClipboardSync(), H.info("START_CLIPBOARD_SYNC", {
@@ -4610,8 +4608,7 @@ class Li {
     });
   }
   _authenticate() {
-    var t = this._appIdField.getValue().trim();
-    t || (t = De, this._appIdField.setValue(t)), this._mendAppId = t, localStorage.setItem("mendAppId", t), this._openBrowserAuth();
+    this._mendAppId = Se, localStorage.setItem("mendAppId", Se), this._openBrowserAuth();
   }
   _hide() {
     this._router.openMain(), this._logoutLink.classList.remove("hidden");
@@ -4635,7 +4632,7 @@ class Li {
     localStorage.setItem("mendToken", t), localStorage.setItem("mendTokenExpiresAt", String(Date.now() + 720 * 60 * 60 * 1e3));
   }
 }
-function Ee() {
+function Pe() {
   this._searchField = new ue("searchField", {
     type: "text",
     autofocus: !0,
@@ -4651,7 +4648,7 @@ function Ee() {
     description: w("Search in:")
   }), this._subscribers = [], this._addEventListeners();
 }
-Ee.prototype._addEventListeners = function() {
+Pe.prototype._addEventListeners = function() {
   var e = this;
   this._searchField.subscribe(function(t) {
     if (t.type === "inputfield:blur" || t.type === "inputfield:submit") {
@@ -4664,7 +4661,7 @@ Ee.prototype._addEventListeners = function() {
     t.type === "button:click" && (e._librarySelectList.isOpen || t.detail.originalEvent && t.detail.originalEvent.stopPropagation());
   });
 };
-Ee.prototype.addGroups = function(e) {
+Pe.prototype.addGroups = function(e) {
   var t = this, i = localStorage.getItem("selectedGroups"), n = i ? JSON.parse(i).map(function(b) {
     return b.toString();
   }) : ["all_collections"], s = !1;
@@ -4695,12 +4692,12 @@ Ee.prototype.addGroups = function(e) {
     this._selectedGroupsWatcher(r, e);
   }
 };
-Ee.prototype._getSelectedGroups = function() {
+Pe.prototype._getSelectedGroups = function() {
   var e = this._librarySelectList.getSelectedValues();
   return (Array.isArray(e) === !1 || e.length === 0) && setTimeout(function() {
   }, 500), e === null || typeof e == "string" ? [] : e;
 };
-Ee.prototype.subscribe = function(e) {
+Pe.prototype.subscribe = function(e) {
   var t = this;
   return this._subscribers.push(e), {
     unsubscribe: function() {
@@ -4710,7 +4707,7 @@ Ee.prototype.subscribe = function(e) {
     }
   };
 };
-Ee.prototype._selectedGroupsWatcher = function(e, t) {
+Pe.prototype._selectedGroupsWatcher = function(e, t) {
   var i = this;
   this._librarySelectList instanceof ge && this._librarySelectList.subscribe(function(n) {
     if (n.type === "selectbox:change") {
@@ -4956,7 +4953,7 @@ W.prototype.count = function() {
     obj: null,
     groups: [],
     groupsHash: ""
-  }, l = !1, u, h, _, d, v, b, O, T = new Pe("libLoader", w("Loading...")), E = {};
+  }, l = !1, u, h, _, d, v, b, O, T = new Te("libLoader", w("Loading...")), E = {};
   function I() {
     var p = document.getElementById("errorWrapper");
     if (!p)
@@ -4964,7 +4961,7 @@ W.prototype.count = function() {
     var g = document.getElementById("mainState");
     if (!g)
       throw new Error("mainState not found");
-    u = new Ee(), h = new W(e, Ut, Vt), _ = new Y("saveAsTextBtn", {
+    u = new Pe(), h = new W(e, Ut, Vt), _ = new Y("saveAsTextBtn", {
       variant: "secondary"
     }), d = new Y("insertLinkBtn", {
       disabled: !0
@@ -4981,15 +4978,15 @@ W.prototype.count = function() {
     };
   }
   window.Asc.plugin.init = function() {
-    Pe.show(), I(), t = new ke(), s = new Li(t), i = new Xt({
+    Te.show(), I(), t = new Ee(), s = new Li(t), i = new Xt({
       authFlow: s.getAuthFlow()
     }), n = new U(t, e), r = new bi(n.getLocalesManager(), n.getStyleManager());
     var p = !1;
     ye(), s.init().onOpen(function() {
-      Pe.hide();
+      Te.hide();
     }).onAuthorized(function() {
       if (!p) {
-        p = !0, Pe.hide(), t.openMain();
+        p = !0, Te.hide(), t.openMain();
         var g = j().catch((S) => {
           console.warn("loadGroups non-fatal error:", S);
         }), y = n.init().catch((S) => {
@@ -5001,7 +4998,7 @@ W.prototype.count = function() {
         }).catch(function(S) {
           console.error("Initialization error:", S);
         }).finally(function() {
-          Pe.hide(), T.hide();
+          Te.hide(), T.hide();
         });
       }
     }), window.Asc.plugin.onTranslate = Rt, Gt().then((g) => {
@@ -5015,8 +5012,8 @@ W.prototype.count = function() {
   function D() {
     T.show();
     var p = i.getItems(null).then((g) => (delete g.next, g));
-    return He(p, !1).then((g) => {
-      g > 0 ? Be("started") : Be("empty");
+    return Re(p, !1).then((g) => {
+      g > 0 ? He("started") : He("empty");
     }).catch((g) => {
       console.error(g);
     }).finally(() => {
@@ -5034,7 +5031,7 @@ W.prototype.count = function() {
       h.clearLibrary();
       var A = [];
       return new Promise((F) => {
-        A.push(He(i.getItems(g), !1)), o.text = g, o.obj = null, o.groups = [], o.groupsHash = S, F(A);
+        A.push(Re(i.getItems(g), !1)), o.text = g, o.obj = null, o.groups = [], o.groupsHash = S, F(A);
       });
     }
     u.subscribe(function(g, y) {
@@ -5050,7 +5047,7 @@ W.prototype.count = function() {
         var F = 0;
         A.forEach(function(P) {
           P.status === "fulfilled" && (F += P.value);
-        }), F === 0 ? (Be("empty"), h.displayNothingFound()) : Be("not-empty");
+        }), F === 0 ? (He("empty"), h.displayNothingFound()) : He("not-empty");
       });
     }), O.subscribe(/* @__PURE__ */ (function() {
       var g = C(function* (y) {
@@ -5232,7 +5229,7 @@ W.prototype.count = function() {
   function gt(p, g, y) {
     y ? p.classList.add(g) : p.classList.remove(g);
   }
-  function Be(p) {
+  function He(p) {
     var g = document.getElementById("searchLabel");
     if (!g) {
       console.error("Search label not found");
@@ -5256,9 +5253,9 @@ W.prototype.count = function() {
     }
   }
   function Ut() {
-    console.warn("Loading more..."), o.obj && o.obj.next && He(o.obj.next(), !1);
+    console.warn("Loading more..."), o.obj && o.obj.next && Re(o.obj.next(), !1);
     for (var p = 0; p < o.groups.length && o.groups[p].next; p++)
-      He(i.getGroupItems(o.groups[p].next(), o.groups[p].id), !0);
+      Re(i.getGroupItems(o.groups[p].next(), o.groups[p].id), !0);
   }
   function Vt(p) {
     if (t.getRoute() != "main" || p.scrollTop + p.clientHeight < p.scrollHeight)
@@ -5268,7 +5265,7 @@ W.prototype.count = function() {
       y.next && (g = !1);
     }), !(!o.obj || !o.obj.next || !g || !o.obj && !o.text.trim() && !o.groups.length);
   }
-  function He(p, g) {
+  function Re(p, g) {
     return p.then(function(y) {
       return vt(y, null, g);
     }).catch(function(y) {
