@@ -26,7 +26,7 @@ class LoginPage {
         const self = this;
         logger.info("LOGIN_PAGE_INIT", {});
 
-        // Expose global window click functions for instant inline triggering
+        // Attach globally available handlers
         // @ts-ignore
         window.onSignInClick = function () {
             logger.info("CLICK_SIGN_IN", {});
@@ -46,6 +46,9 @@ class LoginPage {
                 self._applyManualToken(input.value);
             }
         };
+
+        // Also bind listeners directly to DOM elements
+        this._bindDOM();
 
         const triggers = {
             onOpen: function (cb) {
@@ -75,7 +78,40 @@ class LoginPage {
         return triggers;
     }
 
+    _bindDOM() {
+        const self = this;
+        const btnSignIn = document.getElementById("getBrowserTokenBtn");
+        if (btnSignIn) {
+            btnSignIn.onclick = function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self._openInAppModalAuth();
+            };
+        }
+
+        const btnDemo = document.getElementById("demoModeBtn");
+        if (btnDemo) {
+            btnDemo.onclick = function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self._startDemoMode();
+            };
+        }
+
+        const btnConnect = document.getElementById("connectTokenBtn");
+        const tokenInput = document.getElementById("tokenField");
+        if (btnConnect && tokenInput) {
+            btnConnect.onclick = function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // @ts-ignore
+                self._applyManualToken(tokenInput.value);
+            };
+        }
+    }
+
     _startDemoMode() {
+        logger.info("STARTING_DEMO_MODE", {});
         this._saveToken("DEMO_MODE_TOKEN");
         this._hide();
         this._onAuthorized();
@@ -83,6 +119,7 @@ class LoginPage {
 
     _openInAppModalAuth() {
         const self = this;
+        logger.info("OPENING_AUTH_FLOW", {});
         AuthModalManager.openModalAuth((token) => {
             self._saveToken(token);
             self._hide();

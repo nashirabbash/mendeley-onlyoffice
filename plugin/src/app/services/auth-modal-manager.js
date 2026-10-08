@@ -26,14 +26,36 @@ class AuthModalManager {
             }
         };
 
-        // Open in browser
+        // Try ONLYOFFICE executeMethod OpenUrl first
+        try {
+            if (window.Asc && window.Asc.plugin && typeof window.Asc.plugin.executeMethod === "function") {
+                window.Asc.plugin.executeMethod("OpenUrl", [authUrl]);
+            }
+        } catch (e) {
+            console.warn("Asc.plugin.executeMethod OpenUrl failed:", e);
+        }
+
+        // Try direct window.open
         try {
             window.open(authUrl, "_blank");
         } catch (e) {
-            console.error("Window open error:", e);
+            console.warn("window.open failed:", e);
         }
 
-        // Active clipboard & storage watcher
+        // Fallback: create dynamic anchor link with target="_blank" and click it
+        try {
+            const a = document.createElement("a");
+            a.href = authUrl;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (e) {
+            console.warn("anchor click failed:", e);
+        }
+
+        // Active storage watcher for token from OAuth redirect page
         let checksCount = 0;
         const timer = setInterval(() => {
             checksCount++;
