@@ -17,6 +17,7 @@ class AuthModalManager {
         const authUrl = `https://api.mendeley.com/oauth/authorize?client_id=${REGISTERED_APP_ID}&redirect_uri=${encodeURIComponent(REGISTERED_REDIRECT_URI)}&response_type=token&scope=all&state=${stateHash}`;
 
         // Global callback attached to window for internal/popup message reception
+        // @ts-ignore
         window.OAuthCallback = function (token, state) {
             if (token) {
                 localStorage.setItem("mendToken", token);
@@ -25,25 +26,52 @@ class AuthModalManager {
             }
         };
 
+        // @ts-ignore
         window.OAuthError = function (err) {
             if (typeof onError === "function") onError(err);
         };
 
-        // Spawn in-app dialog using window.open in CEF webview
-        const modalWnd = window.open(authUrl, "MendeleyLoginModal", "width=550,height=700,menubar=no,toolbar=no,location=no,status=no");
+        // Standard browser open without blocking features
+        try {
+            window.open(authUrl, "_blank");
+        } catch (e) {
+            console.error("Window open error:", e);
+        }
 
-        // Polling interval to auto-detect token redirection in storage or URL
+        // Active clipboard & storage watcher
+        let checksCount = 0;
         const timer = setInterval(() => {
+            checksCount++;
             const token = localStorage.getItem("mendToken");
             if (token && token !== "DEMO_MODE_TOKEN") {
                 clearInterval(timer);
-                try { if (modalWnd && !modalWnd.closed) modalWnd.close(); } catch (e) {}
                 if (typeof onSuccess === "function") onSuccess(token);
+                return;
             }
-            if (!modalWnd || modalWnd.closed) {
+
+            // Read clipboard automatically
+            if (navigator.clipboard && typeof navigator.clipboard.readText === "function") {
+                navigator.clipboard.readText().then((text) => {
+                    if (text && (text.includes("access_token=") || text.startsWith("MSw"))) {
+                        let clean = text.trim();
+                        if (clean.includes("access_token=")) {
+                            const match = clean.match(/access_token=([^&]+)/);
+                            if (match && match[1]) clean = match[1];
+                        }
+                        if (clean.length > 30) {
+                            clearInterval(timer);
+                            localStorage.setItem("mendToken", clean);
+                            localStorage.setItem("mendTokenExpiresAt", String(Date.now() + (30 * 24 * 60 * 60 * 1000)));
+                            if (typeof onSuccess === "function") onSuccess(clean);
+                        }
+                    }
+                }).catch(() => {});
+            }
+
+            if (checksCount > 180) { // 3 minutes timeout
                 clearInterval(timer);
             }
-        }, 500);
+        }, 1000);
     }
 }
 

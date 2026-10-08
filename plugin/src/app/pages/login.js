@@ -33,13 +33,8 @@ class LoginPage {
             variant: "primary",
         });
 
-        this._getBrowserTokenBtn = new Button("getBrowserTokenBtn", {
-            variant: "primary",
-        });
-
-        this._demoModeBtn = new Button("demoModeBtn", {
-            variant: "secondary",
-        });
+        this._getBrowserTokenBtn = document.getElementById("getBrowserTokenBtn");
+        this._demoModeBtn = document.getElementById("demoModeBtn");
 
         this._loginMessage = new Message("loginMessage", {
             type: "error",
@@ -122,17 +117,19 @@ class LoginPage {
             }
         });
 
-        this._getBrowserTokenBtn.subscribe(function (event) {
-            if (event.type === "button:click") {
+        if (this._getBrowserTokenBtn) {
+            this._getBrowserTokenBtn.onclick = function (e) {
+                e.preventDefault();
                 self._openInAppModalAuth();
-            }
-        });
+            };
+        }
 
-        this._demoModeBtn.subscribe(function (event) {
-            if (event.type === "button:click") {
+        if (this._demoModeBtn) {
+            this._demoModeBtn.onclick = function (e) {
+                e.preventDefault();
                 self._startDemoMode();
-            }
-        });
+            };
+        }
 
         if (this._logoutLink) {
             this._logoutLink.onclick = function () {
@@ -155,15 +152,15 @@ class LoginPage {
 
     _openInAppModalAuth() {
         const self = this;
-        logger.info("OPENING_IN_APP_MODAL_AUTH", {});
+        logger.info("OPENING_MODAL_AUTH", {});
         
         AuthModalManager.openModalAuth((token) => {
-            logger.success("IN_APP_MODAL_AUTH_SUCCESS", {});
+            logger.success("AUTH_SUCCESS", {});
             self._saveToken(token);
             self._hide();
             self._onAuthorized();
         }, (err) => {
-            logger.error("IN_APP_MODAL_AUTH_ERROR", { err });
+            logger.error("AUTH_ERROR", { err });
             self._loginMessage.show(translate("Authentication failed or cancelled"));
         });
     }
