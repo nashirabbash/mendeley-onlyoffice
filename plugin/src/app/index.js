@@ -169,21 +169,27 @@ import "../styles.css";
                     settings.show();
                 });
 
-                Promise.all([
-                    loadGroupsPromise,
-                    initSettingsPromise,
-                    citationService.checkOldVersion(),
-                    showCitationsAtTheStartFromMyLibrary()
-                ]).then(function ([g, s, isUpdateOldVersion, c]) {
-                    if (isUpdateOldVersion) {
+                const timeoutGuard = new Promise((resolve) => setTimeout(resolve, 5000));
+                
+                Promise.race([
+                    Promise.all([
+                        loadGroupsPromise,
+                        initSettingsPromise,
+                        citationService.checkOldVersion().catch(() => false),
+                        showCitationsAtTheStartFromMyLibrary().catch(() => 0)
+                    ]),
+                    timeoutGuard
+                ]).then(function (res) {
+                    if (Array.isArray(res) && res[2]) {
                         settings.show();
                     } else {
                         addContextMenuButtons();
                     }
                 }).catch(function (error) {
-                    console.error(error.message);
+                    console.error("Initialization error:", error);
                 }).finally(function () {
                     Loader.hide();
+                    libLoader.hide();
                 });
             });
 

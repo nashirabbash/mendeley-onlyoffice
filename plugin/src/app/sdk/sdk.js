@@ -16,23 +16,72 @@ import { MendeleyToCls } from "./mendeley-to-csl";
 import { DEMO_DOCUMENTS, DEMO_GROUPS } from "../shared/constants/demo-data";
 import { logger } from "../services/logger-service";
 
+const API_BASE = "https://api.mendeley.com";
+
 class Sdk {
     /** @param {{authFlow: any}} authFlow */
     constructor(authFlow) {
         this._authFlow = authFlow;
         try {
             // @ts-ignore
-            this._mendeleySdk = MendeleySDK(authFlow);
+            if (typeof MendeleySDK === "function") {
+                // @ts-ignore
+                this._mendeleySdk = MendeleySDK(authFlow);
+            }
         } catch (e) {
-            logger.warn("SDK_INIT_FALLBACK", { message: "MendeleySDK standalone not available, fallback to mock mode" });
+            logger.warn("SDK_INIT_FALLBACK", { message: e.message });
         }
         this._userId = 0;
         /** @type {Array<UserGroupInfo>} */
         this._userGroups = [];
     }
 
+    _getToken() {
+        return localStorage.getItem("mendToken");
+    }
+
     _isDemoMode() {
-        return localStorage.getItem("mendToken") === "DEMO_MODE_TOKEN";
+        return this._getToken() === "DEMO_MODE_TOKEN";
+    }
+
+    async _fetch(endpoint, options = {}) {
+        const token = this._getToken();
+        if (!token) {
+            throw new Error("No Mendeley access token available");
+        }
+
+        const headers = {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.mendeley-document.1+json",
+            ...(options.headers || {})
+        };
+
+        const url = endpoint.startsWith("http") ? endpoint : `${API_BASE}${endpoint}`;
+        logger.info("FETCH_API_REQUEST", { url });
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers,
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                const text = await response.text().catch(() => "");
+                logger.error("FETCH_API_ERROR", { status: response.status, statusText: response.statusText, text });
+                throw new Error(`Mendeley API error (${response.status}): ${response.statusText}`);
+            }
+
+            return await response.json();
+        } catch (err) {
+            clearTimeout(timeoutId);
+            logger.error("FETCH_API_EXCEPTION", { message: err.message });
+            throw err;
+        }
     }
 
     /**
@@ -42,7 +91,7 @@ class Sdk {
      * @param {string} [format]
      * @returns {Promise<SearchResult>}
      */
-    getItems(search, itemsID, format) {
+    async getItems(search, itemsID, format) {
         if (this._isDemoMode()) {
             logger.info("FETCHING_DEMO_ITEMS", { search, count: DEMO_DOCUMENTS.length });
             let filtered = DEMO_DOCUMENTS;
@@ -59,36 +108,32 @@ class Sdk {
             }
             const copy = JSON.parse(JSON.stringify(filtered));
             copy.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
-            return Promise.resolve({ items: copy });
+            return { items: copy };
         }
 
-        let promise = Promise.resolve({ items: [] });
-
-        if (search) {
-            promise = this._mendeleySdk.documents.search({
-                query: search,
-                limit: 20,
-                view: "bib",
-            });
-        } else if (itemsID && itemsID.length) {
-            // Fallback for document retrieval by IDs
-            promise = Promise.all(
-                itemsID.map(id => this._mendeleySdk.documents.get(id, { view: "bib" }).catch(() => null))
-            ).then(items => ({ items: items.filter(Boolean) }));
-        } else {
-            promise = this._mendeleySdk.documents.list({
-                limit: 16,
-                view: "bib",
-                sort: "last_modified",
-                order: "desc"
-            });
-        }
-        return promise.then((response) => {
-            if (response && response.items) {
-                response.items.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+        try {
+            let items = [];
+            if (search) {
+                const queryParam = encodeURIComponent(search);
+                items = await this._fetch(`/search/documents?query=${queryParam}&limit=20&view=bib`);
+            } else if (itemsID && itemsID.length) {
+                items = await Promise.all(
+                    itemsID.map(id => this._fetch(`/documents/${id}?view=bib`).catch(() => null))
+                );
+                items = items.filter(Boolean);
+            } else {
+                items = await this._fetch(`/documents?limit=25&view=bib&sort=last_modified&order=desc`);
             }
-            return response;
-        });
+
+            const resultItems = Array.isArray(items) ? items : (items.items || []);
+            resultItems.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+            logger.success("FETCHED_DOCUMENTS_SUCCESS", { count: resultItems.length });
+            return { items: resultItems };
+        } catch (err) {
+            logger.error("GET_ITEMS_FAILED", { message: err.message });
+            // Fallback to demo mode if token expired/network failed
+            return { items: [] };
+        }
     }
 
     /**
@@ -98,38 +143,41 @@ class Sdk {
      * @param {string[]} [itemsID]
      * @returns {Promise<SearchResult>}
      */
-    getGroupItems(search, groupId, itemsID) {
+    async getGroupItems(search, groupId, itemsID) {
         if (this._isDemoMode()) {
             return this.getItems(search, itemsID);
         }
-        return this._mendeleySdk.documents.list({
-            group_id: String(groupId),
-            limit: 20,
-            view: "bib"
-        }).then(response => {
-            if (response && response.items) {
-                response.items.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
-            }
-            return response;
-        });
+        try {
+            const items = await this._fetch(`/documents?group_id=${groupId}&limit=25&view=bib`);
+            const resultItems = Array.isArray(items) ? items : (items.items || []);
+            resultItems.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+            return { items: resultItems };
+        } catch (e) {
+            logger.error("GET_GROUP_ITEMS_FAILED", { message: e.message });
+            return { items: [] };
+        }
     }
 
     /**
      * Get user groups
      * @returns {Promise<Array<UserGroupInfo>>}
      */
-    getUserGroups() {
+    async getUserGroups() {
         if (this._isDemoMode()) {
-            return Promise.resolve(DEMO_GROUPS);
+            return DEMO_GROUPS;
         }
-        return this._mendeleySdk.folders.list({
-            limit: 6
-        }).then((response) => {
-            if (response && response.items && response.items.length) {
-                return response.items;
+        try {
+            const groups = await this._fetch(`/groups?limit=20`, {
+                headers: { "Accept": "application/vnd.mendeley-group.1+json" }
+            });
+            if (Array.isArray(groups)) {
+                return groups.map(g => ({ id: g.id, name: g.name }));
             }
             return [];
-        });
+        } catch (e) {
+            logger.warn("GET_USER_GROUPS_FAILED", { message: e.message });
+            return [];
+        }
     }
 }
 
