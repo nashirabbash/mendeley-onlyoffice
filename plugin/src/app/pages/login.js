@@ -16,9 +16,9 @@ import { InputField, Button, Message } from "../shared/components";
 import { translate } from "../services";
 import { logger } from "../services/logger-service";
 
-// Canonical Public Client ID for OnlyOffice Mendeley Integration
-const DEFAULT_CLIENT_ID = "26014";
-const DEFAULT_REDIRECT_URI = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
+// Real registered Mendeley Application ID
+const REGISTERED_APP_ID = "26014";
+const REGISTERED_REDIRECT_URI = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
 
 class LoginPage {
     /**
@@ -71,10 +71,17 @@ class LoginPage {
     init() {
         const self = this;
         logger.info("LOGIN_INIT", { message: "Initializing Mendeley Login Page" });
-        this._addEventListeners();
-
-        this._mendAppId = localStorage.getItem("mendAppId") || DEFAULT_CLIENT_ID;
+        
+        // Force refresh cached legacy App ID
+        const cachedAppId = localStorage.getItem("mendAppId");
+        if (!cachedAppId || cachedAppId === "777" || cachedAppId === "2441") {
+            localStorage.setItem("mendAppId", REGISTERED_APP_ID);
+        }
+        
+        this._mendAppId = localStorage.getItem("mendAppId") || REGISTERED_APP_ID;
         this._appIdField.setValue(this._mendAppId);
+
+        this._addEventListeners();
 
         const triggers = {
             /**
@@ -225,7 +232,11 @@ class LoginPage {
     }
 
     _openBrowserAuth() {
-        const appId = this._appIdField.getValue().trim() || DEFAULT_CLIENT_ID;
+        let appId = this._appIdField.getValue().trim();
+        if (!appId || appId === "777" || appId === "2441") {
+            appId = REGISTERED_APP_ID;
+            this._appIdField.setValue(appId);
+        }
         this._mendAppId = appId;
         localStorage.setItem("mendAppId", appId);
 
@@ -234,14 +245,14 @@ class LoginPage {
             "https://api.mendeley.com/oauth/authorize?client_id=" +
             this._mendAppId +
             "&redirect_uri=" +
-            encodeURIComponent(DEFAULT_REDIRECT_URI) +
+            encodeURIComponent(REGISTERED_REDIRECT_URI) +
             "&response_type=token&scope=all&state=" +
             this._loginStateHash;
 
         logger.info("OPENING_BROWSER_AUTH", { link, appId: this._mendAppId });
         
         // Open OAuth in default browser window
-        const wnd = window.open(link, "_blank", "width=600,height=750");
+        window.open(link, "_blank", "width=600,height=750");
         
         // Focus token input for pasting when redirected
         const tokenInput = document.getElementById("tokenField");
@@ -253,8 +264,8 @@ class LoginPage {
     _authenticate() {
         var appid = this._appIdField.getValue().trim();
         if (!appid) {
-            this._loginMessage.show(translate("AppId is empty"));
-            return;
+            appid = REGISTERED_APP_ID;
+            this._appIdField.setValue(appid);
         }
         this._mendAppId = appid;
         localStorage.setItem("mendAppId", appid);
