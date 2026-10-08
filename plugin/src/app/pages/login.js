@@ -36,6 +36,10 @@ class LoginPage {
             variant: "secondary",
         });
 
+        this._demoModeBtn = new Button("demoModeBtn", {
+            variant: "secondary",
+        });
+
         this._appIdField = new InputField("appIdField", {
             autocomplete: "on",
         });
@@ -87,7 +91,7 @@ class LoginPage {
 
         const existingToken = this._getToken();
         if (existingToken) {
-            logger.info("LOGIN_CACHED_TOKEN_FOUND", { hasToken: true });
+            logger.info("LOGIN_CACHED_TOKEN_FOUND", { hasToken: true, isDemo: existingToken === "DEMO_MODE_TOKEN" });
             self._hide();
             Promise.resolve().then(() => {
                 self._onAuthorized();
@@ -165,6 +169,12 @@ class LoginPage {
             }
         });
 
+        this._demoModeBtn.subscribe(function (event) {
+            if (event.type === "button:click") {
+                self._startDemoMode();
+            }
+        });
+
         this._loginBtn.subscribe(function (event) {
             if (event.type === "button:click") {
                 self._authenticate();
@@ -178,6 +188,13 @@ class LoginPage {
             self._show();
             return true;
         };
+    }
+
+    _startDemoMode() {
+        logger.info("START_DEMO_MODE", { message: "Activating offline demonstration library mode" });
+        this._saveToken("DEMO_MODE_TOKEN");
+        this._hide();
+        this._onAuthorized();
     }
 
     _applyManualToken() {
@@ -266,7 +283,6 @@ class LoginPage {
     /** @param {string} token */
     _saveToken(token) {
         localStorage.setItem("mendToken", token);
-        // Persist for 30 days or until refreshed
         localStorage.setItem("mendTokenExpiresAt", String(Date.now() + (30 * 24 * 60 * 60 * 1000)));
     }
 }

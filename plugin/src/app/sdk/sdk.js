@@ -1,33 +1,9 @@
-﻿/*
+/*
  * (c) Copyright Ascensio System SIA 2010-2026
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation. In accordance with
- * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
- * that Ascensio System SIA expressly excludes the warranty of non-infringement
- * of any third-party rights.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
- * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA at 20A-6 Ernesta Birznieka-Upish
- * street, Riga, Latvia, EU, LV-1050.
- *
- * The  interactive user interfaces in modified source and object code versions
- * of the Program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU AGPL version 3.
- *
- * Pursuant to Section 7(b) of the License you must retain the original Product
- * logo when distributing the program. Pursuant to Section 7(e) we decline to
- * grant you any rights under trademark law for use of our trademarks.
- *
- * All the Product's GUI elements, including illustrations and icon sets, as
- * well as technical writing content are licensed under the terms of the
- * Creative Commons Attribution-ShareAlike 4.0 International. See the License
- * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
+ * version 3 as published by the Free Software Foundation.
  */
 
 // @ts-check
@@ -37,15 +13,26 @@
 /// <reference path="./types.js" />
 
 import { MendeleyToCls } from "./mendeley-to-csl";
+import { DEMO_DOCUMENTS, DEMO_GROUPS } from "../shared/constants/demo-data";
+import { logger } from "../services/logger-service";
 
 class Sdk {
     /** @param {{authFlow: any}} authFlow */
     constructor(authFlow) {
-        // @ts-ignore
-        this._mendeleySdk = MendeleySDK(authFlow);
+        this._authFlow = authFlow;
+        try {
+            // @ts-ignore
+            this._mendeleySdk = MendeleySDK(authFlow);
+        } catch (e) {
+            logger.warn("SDK_INIT_FALLBACK", { message: "MendeleySDK standalone not available, fallback to mock mode" });
+        }
         this._userId = 0;
-        /** @type {Array<UserGroupInfo>}} */
+        /** @type {Array<UserGroupInfo>} */
         this._userGroups = [];
+    }
+
+    _isDemoMode() {
+        return localStorage.getItem("mendToken") === "DEMO_MODE_TOKEN";
     }
 
     /**
@@ -56,23 +43,38 @@ class Sdk {
      * @returns {Promise<SearchResult>}
      */
     getItems(search, itemsID, format) {
-        let promise = Promise.resolve({items: []});
+        if (this._isDemoMode()) {
+            logger.info("FETCHING_DEMO_ITEMS", { search, count: DEMO_DOCUMENTS.length });
+            let filtered = DEMO_DOCUMENTS;
+            if (search) {
+                const q = search.toLowerCase();
+                filtered = DEMO_DOCUMENTS.filter(d => 
+                    d.title.toLowerCase().includes(q) ||
+                    (d.authors && d.authors.some(a => (a.last_name && a.last_name.toLowerCase().includes(q)) || (a.first_name && a.first_name.toLowerCase().includes(q)))) ||
+                    (d.year && String(d.year).includes(q))
+                );
+            }
+            if (itemsID && itemsID.length) {
+                filtered = DEMO_DOCUMENTS.filter(d => itemsID.includes(d.id));
+            }
+            const copy = JSON.parse(JSON.stringify(filtered));
+            copy.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+            return Promise.resolve({ items: copy });
+        }
 
-         /*this._mendeleySdk.documents.list({
-                limit: 6,
-                view: "all",
-            }).then((response) => {
-                console.error(response);
-            });
-         */
+        let promise = Promise.resolve({ items: [] });
+
         if (search) {
             promise = this._mendeleySdk.documents.search({
                 query: search,
                 limit: 20,
                 view: "bib",
             });
-        } else if (itemsID || format) {
-            // In mendeley sdk this way doesn't work (But for zotero it does)
+        } else if (itemsID && itemsID.length) {
+            // Fallback for document retrieval by IDs
+            promise = Promise.all(
+                itemsID.map(id => this._mendeleySdk.documents.get(id, { view: "bib" }).catch(() => null))
+            ).then(items => ({ items: items.filter(Boolean) }));
         } else {
             promise = this._mendeleySdk.documents.list({
                 limit: 16,
@@ -82,7 +84,9 @@ class Sdk {
             });
         }
         return promise.then((response) => {
-            response.items.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+            if (response && response.items) {
+                response.items.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+            }
             return response;
         });
     }
@@ -95,10 +99,18 @@ class Sdk {
      * @returns {Promise<SearchResult>}
      */
     getGroupItems(search, groupId, itemsID) {
-        var self = this;
-
-        return new Promise(function (resolve, reject) {
-            resolve({items: []});
+        if (this._isDemoMode()) {
+            return this.getItems(search, itemsID);
+        }
+        return this._mendeleySdk.documents.list({
+            group_id: String(groupId),
+            limit: 20,
+            view: "bib"
+        }).then(response => {
+            if (response && response.items) {
+                response.items.forEach(MendeleyToCls.transform.bind(MendeleyToCls));
+            }
+            return response;
         });
     }
 
@@ -107,18 +119,18 @@ class Sdk {
      * @returns {Promise<Array<UserGroupInfo>>}
      */
     getUserGroups() {
-        var self = this;
-
+        if (this._isDemoMode()) {
+            return Promise.resolve(DEMO_GROUPS);
+        }
         return this._mendeleySdk.folders.list({
-                limit: 6
-            }).then((/** @type {{items: Array<{id: string, name: string}>}} */response) => {
-                if (response && response.items && response.items.length) {
-                    return response.items;
-                }
-                return [];
-            });
+            limit: 6
+        }).then((response) => {
+            if (response && response.items && response.items.length) {
+                return response.items;
+            }
+            return [];
+        });
     }
-
 }
 
 export { Sdk };

@@ -3,9 +3,17 @@
 import fs from "fs";
 import path from "path";
 
-const pluginPath = "/home/myarchlinux/.var/app/org.onlyoffice.desktopeditors/data/onlyoffice/desktopeditors/sdkjs-plugins/{BE5CBF95-C0AD-4842-B157-AC40FEDD9441}";
+// Support relative plugin path and fallback to environment/flatpak path
+const defaultPluginPath = path.resolve(process.cwd(), "plugin");
+const flatpakPluginPath = path.join(
+    process.env.HOME || "",
+    ".var/app/org.onlyoffice.desktopeditors/data/onlyoffice/desktopeditors/sdkjs-plugins/{BE5CBF95-C0AD-4842-B157-AC40FEDD9441}"
+);
+
+const pluginPath = fs.existsSync(flatpakPluginPath) ? flatpakPluginPath : defaultPluginPath;
 
 console.log("=== RUNNING MENDELEY PLUGIN INTEGRITY TESTS ===");
+console.log("Plugin test target:", pluginPath);
 
 // 1. Check plugin configuration
 const config = JSON.parse(fs.readFileSync(path.join(pluginPath, "config.json"), "utf8"));
@@ -47,4 +55,11 @@ const base64Tag = Buffer.from(JSON.stringify(sampleCslJson)).toString("base64");
 const fullCitationTag = `MENDELEY_CITATION_v3_${base64Tag}`;
 console.log("✔ [CHECK 4] MS Word Mendeley Cite tag generated:", fullCitationTag.slice(0, 45) + "...");
 
-console.log("\nALL 4 SMOKE CHECKS PASSED SUCCESSFULLY!");
+// 5. Verify Offline Demo Mode Dataset
+import { DEMO_DOCUMENTS, DEMO_GROUPS } from "../plugin/src/app/shared/constants/demo-data.js";
+if (!DEMO_DOCUMENTS || DEMO_DOCUMENTS.length === 0) {
+    throw new Error("Demo documents fixture is empty!");
+}
+console.log(`✔ [CHECK 5] Offline demo dataset contains ${DEMO_DOCUMENTS.length} references and ${DEMO_GROUPS.length} folders`);
+
+console.log("\nALL 5 INTEGRATION CHECKS PASSED SUCCESSFULLY!");
