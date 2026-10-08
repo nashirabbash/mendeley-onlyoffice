@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="dist/styles.css">
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: #333; margin: 0; padding: 0; }
-        .btn-action { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; margin-bottom: 12px; font-size: 13px; }
-        .btn-primary { background-color: #d32f2f; color: white; }
-        .btn-secondary { background-color: #f1f3f4; color: #333; border: 1px solid #dadce0; }
+        .btn-action { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; margin-bottom: 10px; font-size: 13px; text-align: center; text-decoration: none; display: block; }
+        .btn-primary { background-color: #d32f2f; color: white !important; }
+        .btn-secondary { background-color: #f1f3f4; color: #333 !important; border: 1px solid #dadce0; }
+        .btn-link { background-color: #e3f2fd; color: #1976d2 !important; border: 1px solid #90caf9; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -27,23 +28,24 @@
                 <p style="font-weight: 700; font-size: 16px; margin: 0 0 6px 0; color: #b71c1c;">Mendeley Reference Manager</p>
                 <p style="font-size: 12px; color: #666; margin: 0 0 16px 0; line-height: 1.4;">Sign in to search and insert citations directly from your Mendeley cloud library.</p>
                 
-                <!-- Direct Inline Trigger Button -->
-                <button id="getBrowserTokenBtn" class="btn-action btn-primary" onclick="window.onSignInClick()">
-                    Sign In with Mendeley Account
-                </button>
-                
-                <!-- Demo Mode Button -->
+                <!-- OPSI 1: Native External Browser Link -->
+                <a id="browserAuthLink" class="btn-action btn-primary" target="_blank"
+                   href="https://api.mendeley.com/oauth/authorize?client_id=26014&redirect_uri=https%3A%2F%2Fonlyoffice.github.io%2Fsdkjs-plugins%2Fcontent%2Fmendeley%2Foauth.html&response_type=token&scope=all">
+                    1. Buka Login di Browser ↗
+                </a>
+
+                <!-- OPSI 2: Direct Offline Demo Mode -->
                 <button id="demoModeBtn" class="btn-action btn-secondary" onclick="window.onDemoModeClick()">
-                    Try Offline Demo Mode
+                    2. Masuk Demo Mode (Langsung Coba)
                 </button>
                 
-                <!-- Manual Token Field -->
+                <!-- OPSI 3: Direct Token Input Box -->
                 <div style="margin-top: 14px; border-top: 1px solid #eee; padding-top: 14px;">
-                    <span style="font-size: 12px; font-weight: 600; color: #555; display: block; margin-bottom: 6px;">Access Token / Bearer Token:</span>
-                    <input id="tokenField" type="password" placeholder="Paste Mendeley Token here" 
+                    <span style="font-size: 12px; font-weight: 600; color: #555; display: block; margin-bottom: 6px;">3. Atau Tempel Bearer Token:</span>
+                    <input id="tokenField" type="password" placeholder="Paste Mendeley Token here..." 
                         style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; margin-bottom: 8px;" />
-                    <button id="connectTokenBtn" class="btn-action btn-secondary" onclick="window.onConnectTokenClick()" style="margin-bottom: 0;">
-                        Connect with Token
+                    <button id="connectTokenBtn" class="btn-action btn-link" onclick="window.onConnectTokenClick()" style="margin-bottom: 0;">
+                        Hubungkan dengan Token
                     </button>
                 </div>
                 
