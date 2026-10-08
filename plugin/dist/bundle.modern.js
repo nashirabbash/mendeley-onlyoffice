@@ -3849,9 +3849,9 @@ class ti {
       typeof i == "function" && i(l);
     };
     try {
+      window.Asc && window.Asc.plugin && typeof window.Asc.plugin.executeMethod == "function" ? window.Asc.plugin.executeMethod("OpenUrl", [s]) : window.open(s, "_blank");
+    } catch {
       window.open(s, "_blank");
-    } catch (l) {
-      console.error("Window open error:", l);
     }
     var r = 0, o = setInterval(() => {
       r++;

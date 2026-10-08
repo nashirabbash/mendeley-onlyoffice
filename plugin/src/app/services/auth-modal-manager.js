@@ -31,11 +31,15 @@ class AuthModalManager {
             if (typeof onError === "function") onError(err);
         };
 
-        // Standard browser open without blocking features
+        // Method 1: Ask ONLYOFFICE host editor to open browser via executeMethod
         try {
-            window.open(authUrl, "_blank");
+            if (window.Asc && window.Asc.plugin && typeof window.Asc.plugin.executeMethod === "function") {
+                window.Asc.plugin.executeMethod("OpenUrl", [authUrl]);
+            } else {
+                window.open(authUrl, "_blank");
+            }
         } catch (e) {
-            console.error("Window open error:", e);
+            window.open(authUrl, "_blank");
         }
 
         // Active clipboard & storage watcher
