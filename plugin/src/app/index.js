@@ -131,7 +131,6 @@ import "../styles.css";
     }
 
     window.Asc.plugin.init = function () {
-        Loader.show();
         initElements();
 
         router = new Router();
@@ -158,15 +157,10 @@ import "../styles.css";
                 if (isInit) return;
                 isInit = true;
                 Loader.hide();
-                
                 router.openMain();
 
-                let loadGroupsPromise = loadGroups().catch((e) => {
-                    console.warn("loadGroups non-fatal error:", e);
-                });
-                let initSettingsPromise = settings.init().catch((e) => {
-                    console.warn("settings.init non-fatal error:", e);
-                });
+                let loadGroupsPromise = loadGroups().catch(() => []);
+                let initSettingsPromise = settings.init().catch(() => {});
 
                 Promise.all([
                     loadGroupsPromise,
