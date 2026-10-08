@@ -15,9 +15,7 @@
 import { InputField, Button, Message, Loader } from "../shared/components";
 import { translate } from "../services";
 import { logger } from "../services/logger-service";
-
-const REGISTERED_APP_ID = "26014";
-const REGISTERED_REDIRECT_URI = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
+import { AuthModalManager } from "../services/auth-modal-manager";
 
 class LoginPage {
     /**
@@ -48,7 +46,6 @@ class LoginPage {
         });
 
         this._logoutLink = document.getElementById("logoutLink");
-        this._loginStateHash = "";
         this._onAuthorized = function () {};
         this._onOpen = function () {};
     }
@@ -79,7 +76,6 @@ class LoginPage {
             return triggers;
         }
 
-        // Show login UI immediately and hide loader
         self._show();
         setTimeout(() => {
             Loader.hide();
@@ -90,10 +86,6 @@ class LoginPage {
     }
 
     onAuthCallback(answer, state) {
-        if (!state || state !== this._loginStateHash) {
-            this._loginMessage.show(translate(answer || "Invalid callback state"));
-            return false;
-        }
         this._saveToken(answer);
         this._onAuthorized();
         this._hide();
@@ -132,7 +124,7 @@ class LoginPage {
 
         this._getBrowserTokenBtn.subscribe(function (event) {
             if (event.type === "button:click") {
-                self._openBrowserAuth();
+                self._openInAppModalAuth();
             }
         });
 
@@ -161,6 +153,21 @@ class LoginPage {
         this._onAuthorized();
     }
 
+    _openInAppModalAuth() {
+        const self = this;
+        logger.info("OPENING_IN_APP_MODAL_AUTH", {});
+        
+        AuthModalManager.openModalAuth((token) => {
+            logger.success("IN_APP_MODAL_AUTH_SUCCESS", {});
+            self._saveToken(token);
+            self._hide();
+            self._onAuthorized();
+        }, (err) => {
+            logger.error("IN_APP_MODAL_AUTH_ERROR", { err });
+            self._loginMessage.show(translate("Authentication failed or cancelled"));
+        });
+    }
+
     _applyManualToken() {
         const rawToken = this._tokenField.getValue().trim();
         if (!rawToken) {
@@ -182,26 +189,6 @@ class LoginPage {
         this._saveToken(cleanToken);
         this._hide();
         this._onAuthorized();
-    }
-
-    _openBrowserAuth() {
-        this._loginStateHash = new Date().getTime().toString();
-        const link =
-            "https://api.mendeley.com/oauth/authorize?client_id=" +
-            REGISTERED_APP_ID +
-            "&redirect_uri=" +
-            encodeURIComponent(REGISTERED_REDIRECT_URI) +
-            "&response_type=token&scope=all&state=" +
-            this._loginStateHash;
-
-        logger.info("OPENING_BROWSER_AUTH", { link });
-        window.open(link, "_blank", "width=600,height=750");
-
-        // Focus token input for pasting when redirected
-        const tokenInput = document.getElementById("tokenField");
-        if (tokenInput) {
-            tokenInput.focus();
-        }
     }
 
     _hide() {

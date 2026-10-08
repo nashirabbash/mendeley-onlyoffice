@@ -3,637 +3,217 @@
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
- * version 3 as published by the Free Software Foundation. In accordance with
- * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
- * that Ascensio System SIA expressly excludes the warranty of non-infringement
- * of any third-party rights.
- *
- * This program is distributed WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
- * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
- *
- * You can contact Ascensio System SIA at 20A-6 Ernesta Birznieka-Upish
- * street, Riga, Latvia, EU, LV-1050.
- *
- * The  interactive user interfaces in modified source and object code versions
- * of the Program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU AGPL version 3.
- *
- * Pursuant to Section 7(b) of the License you must retain the original Product
- * logo when distributing the program. Pursuant to Section 7(e) we decline to
- * grant you any rights under trademark law for use of our trademarks.
- *
- * All the Product's GUI elements, including illustrations and icon sets, as
- * well as technical writing content are licensed under the terms of the
- * Creative Commons Attribution-ShareAlike 4.0 International. See the License
- * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
- *
+ * version 3 as published by the Free Software Foundation.
  */
 
 // @ts-check
 
-/// <reference path="../../types-global.js" />
-/// <reference path="../../sdk/types.js" />
-
-import { translate } from "../../services";
-import { Checkbox, InputField, SelectBox } from "../components";
-import LOCATOR_VALUES from "../constants/locator-values";
-
 /**
- * @typedef {Object} Scroller
- * @property {Function} onscroll
+ * @typedef {import('./types').SelectCitationsComponentItem} SelectCitationsComponentItem
  */
 
-/**
- * @param {string} displayNoneClass
- * @param {function(): void} fLoadMore
- * @param {function(HTMLElement): boolean} fShouldLoadMore
- */
-function SelectCitationsComponent(
-    displayNoneClass,
-    fLoadMore,
-    fShouldLoadMore
-) {
-    this._displayNoneClass = displayNoneClass;
-    /** @type {Object<string|number, SearchResultItem>} */
-    this._items = {};
-    /** @type {Object<string|number, HTMLElement>} */
-    this._html = {};
-    /** @type {Object<string|number, Checkbox>} */
-    this._checks = {};
+class SelectCitationsComponent {
+    /**
+     * @param {string} displayNoneClass
+     * @param {Function} [onLoadMore]
+     * @param {Function} [shouldLoadMore]
+     */
+    constructor(displayNoneClass, onLoadMore, shouldLoadMore) {
+        this.displayNoneClass = displayNoneClass;
+        this.onLoadMore = onLoadMore;
+        this.shouldLoadMore = shouldLoadMore;
+        this.docsHolder = document.getElementById("docsHolder");
+        this.selectedHolder = document.getElementById("selectedHolder");
+        this.selectedWrapper = document.getElementById("selectedWrapper");
+        this.selectedInfo = document.getElementById("selectedInfo");
+        this.selectedCount = document.getElementById("selectedCount");
+        this.cancelSelectBtn = document.getElementById("cancelSelectBtn");
 
-    this._cancelSelectBtn = document.getElementById("cancelSelectBtn");
+        /** @type {Object<string, SelectCitationsComponentItem>} */
+        this.items = {};
+        /** @type {Object<string, boolean>} */
+        this.selected = {};
+        /** @type {Array<Function>} */
+        this.subscribers = [];
 
-    this._docsHolder = document.getElementById("docsHolder");
-    this._nothingFound = document.getElementById("nothingFound");
-    this._docsThumb = document.getElementById("docsThumb");
-    this._selectedWrapper = document.getElementById("selectedWrapper");
-    this._selectedHolder = document.getElementById("selectedHolder");
-    this._selectedInfo = document.getElementById("selectedInfo");
-    this._selectedCount = document.getElementById("selectedCount");
-    this._selectedThumb = document.getElementById("selectedThumb");
-
-    if (this._selectedHolder && this._selectedThumb) {
-        /** @type {Scroller} */
-        this._selectedScroller = this._initScrollBox(
-            this._selectedHolder,
-            this._selectedThumb,
-            20
-        );
+        this._initEvents();
     }
-    if (this._docsHolder && this._docsThumb) {
-        /** @type {Scroller} */
-        this._docsScroller = this._initScrollBox(
-            this._docsHolder,
-            this._docsThumb,
-            40,
-            this._checkDocsScroll.bind(this)
-        );
-    }
-    /** @type {LastSearch | null} */
-    this._lastSearch = null;
-    /** @type {Function[]} */
-    this._subscribers = [];
-    this._fShouldLoadMore = fShouldLoadMore;
-    this._fLoadMore = fLoadMore;
-    /** @type {number} */
-    this._loadTimeout;
-    this._init();
-}
 
-SelectCitationsComponent.prototype._init = function () {
-    const self = this;
-    if (this._cancelSelectBtn) {
-        this._cancelSelectBtn.onclick = function (e) {
-            var ids = [];
-            for (var id in self._items) {
-                ids.push(id);
-            }
-            for (var i = 0; i < ids.length; i++) {
-                self._removeSelected(ids[i]);
-            }
-        };
+    _initEvents() {
+        const self = this;
+        if (this.cancelSelectBtn) {
+            this.cancelSelectBtn.onclick = () => {
+                self.clearSelection();
+            };
+        }
     }
-    if (this._docsHolder) {
-        this._docsHolder.addEventListener("keydown", function (e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === "a") {
-                e.preventDefault();
-                var checkboxes = self._docsHolder?.querySelectorAll(".checkbox-container:not(.checkbox--checked)");
-                checkboxes?.forEach(function (cb) {
-                    /** @type {HTMLElement} */ (cb).click();
-                });
-            }
+
+    subscribe(fn) {
+        this.subscribers.push(fn);
+    }
+
+    _notify() {
+        const count = Object.keys(this.selected).length;
+        this._updateSelectedTray();
+        this.subscribers.forEach(fn => fn(count, this.getSelectedItems()));
+    }
+
+    count() {
+        return Object.keys(this.selected).length;
+    }
+
+    getSelectedItems() {
+        const res = {};
+        for (const id of Object.keys(this.selected)) {
+            if (this.items[id]) res[id] = this.items[id];
+        }
+        return res;
+    }
+
+    clearSelection() {
+        this.selected = {};
+        if (this.docsHolder) {
+            const checkboxes = this.docsHolder.querySelectorAll("input[type='checkbox']");
+            checkboxes.forEach((/** @type {HTMLInputElement} */ cb) => cb.checked = false);
+        }
+        this._notify();
+    }
+
+    clearLibrary() {
+        this.items = {};
+        if (this.docsHolder) this.docsHolder.innerHTML = "";
+    }
+
+    _updateSelectedTray() {
+        if (!this.selectedHolder || !this.selectedWrapper) return;
+        const selectedIds = Object.keys(this.selected);
+        this.selectedHolder.innerHTML = "";
+
+        if (selectedIds.length === 0) {
+            this.selectedWrapper.classList.add("hidden");
+            if (this.selectedInfo) this.selectedInfo.classList.add("hidden");
+            return;
+        }
+
+        this.selectedWrapper.classList.remove("hidden");
+        if (this.selectedInfo) this.selectedInfo.classList.remove("hidden");
+        if (this.selectedCount) this.selectedCount.innerText = `${selectedIds.length} selected`;
+
+        selectedIds.forEach(id => {
+            const item = this.items[id];
+            if (!item) return;
+
+            const chip = document.createElement("div");
+            chip.className = "citation-chip";
+            
+            const firstAuthor = item.authors && item.authors[0] ? (item.authors[0].last_name || item.authors[0].first_name || "Author") : "Author";
+            const yearStr = item.year ? String(item.year) : "n.d.";
+            
+            chip.innerHTML = `
+                <span class="chip-text">${firstAuthor}, ${yearStr}</span>
+                <span class="chip-remove" title="Remove">×</span>
+            `;
+
+            chip.querySelector(".chip-remove")?.addEventListener("click", () => {
+                delete this.selected[id];
+                const cb = document.getElementById(`cb-${id}`);
+                if (cb && cb instanceof HTMLInputElement) cb.checked = false;
+                this._notify();
+            });
+
+            this.selectedHolder.appendChild(chip);
         });
     }
-};
-SelectCitationsComponent.prototype.clearLibrary = function () {
-    this._nothingFound &&
-        this._nothingFound.classList.add(this._displayNoneClass);
-    var holder = this._docsHolder;
-    while (holder && holder.lastChild) {
-        holder.removeChild(holder.lastChild);
-    }
-    if (holder) holder.scrollTop = 0;
-    this._docsScroller.onscroll();
-};
 
-SelectCitationsComponent.prototype.displayNothingFound = function () {
-    this.clearLibrary();
-    this._nothingFound &&
-        this._nothingFound.classList.remove(this._displayNoneClass);
-};
+    displaySearchItems(res, err, lastSearch) {
+        if (!this.docsHolder) return 0;
+        const nothingFound = document.getElementById("nothingFound");
 
-/**
- * @param {SearchResult | null} res
- * @param {Error | null} err
- * @param {LastSearch} lastSearch
- * @returns {Promise<number>}
- */
-SelectCitationsComponent.prototype.displaySearchItems = function (res, err, lastSearch) {
-    const self = this;
-    var holder = this._docsHolder;
-    this._lastSearch = lastSearch;
-
-    let numOfShown = 0;
-
-    return new Promise((resolve, reject) => {
-        if (res && res.items && res.items.length > 0) {
-            const page = document.createElement("div");
-            if (holder) page.classList.add("page" + holder.children.length);
-            for (let index = 0; index < res.items.length; index++) {
-                let item = res.items[index];
-                if (!item.title) {
-                    continue;
-                }
-                page.appendChild(self._buildDocElement(item));
-                numOfShown++;
-            }
-            if (holder) holder.appendChild(page);
-        } else if (err) {
-            reject(err);
+        if (err || !res || !res.items || res.items.length === 0) {
+            if (nothingFound) nothingFound.classList.remove("hidden");
+            return 0;
         }
 
-        this._docsScroller.onscroll();
-        resolve(numOfShown);
-    });
-};
+        if (nothingFound) nothingFound.classList.add("hidden");
 
-/** @returns {Object<string|number, SearchResultItem>} */
-SelectCitationsComponent.prototype.getSelectedItems = function () {
-    const items = Object.assign({}, this._items || {});
-    return items;
-};
+        res.items.forEach(item => {
+            this.items[item.id] = item;
+            const row = document.createElement("div");
+            row.className = "ref-item-card";
 
-/**
- *
- * @param {Array<string|number>} keys
- */
-SelectCitationsComponent.prototype.removeItems = function (keys) {
-    const self = this;
-    keys.forEach(function (key) {
-        self._removeSelected(key);
-    });
-};
+            const firstAuthor = item.authors && item.authors.length ? 
+                item.authors.map(a => `${a.last_name || ""} ${a.first_name ? a.first_name.charAt(0) + "." : ""}`).join(", ") : "Unknown Author";
+            const year = item.year || "";
+            const title = item.title || "Untitled Document";
+            const source = item.source || item.publisher || "";
 
-/**
- * @param {function(number): void} callback
- * @returns {Object}
- */
-SelectCitationsComponent.prototype.subscribe = function (callback) {
-    var self = this;
-    this._subscribers.push(callback);
+            row.innerHTML = `
+                <div class="ref-item-header">
+                    <input type="checkbox" id="cb-${item.id}" class="ref-checkbox" ${this.selected[item.id] ? "checked" : ""} />
+                    <div class="ref-meta">
+                        <div class="ref-title">${title}</div>
+                        <div class="ref-authors">${firstAuthor} ${year ? `(${year})` : ""}</div>
+                        ${source ? `<div class="ref-source">${source}</div>` : ""}
+                    </div>
+                </div>
+                <div class="ref-quick-insert">
+                    <button class="quick-insert-btn" id="btn-quick-${item.id}">
+                        <span>insert citation</span>
+                        <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0L5 6L10 0H0Z"/></svg>
+                    </button>
+                    <div class="quick-insert-menu hidden" id="menu-quick-${item.id}">
+                        <div class="menu-option" data-format="narrative">author (year)</div>
+                        <div class="menu-option" data-format="naked">author year</div>
+                        <div class="menu-option" data-format="parenthetical">(author year)</div>
+                    </div>
+                </div>
+            `;
 
-    return {
-        unsubscribe: function () {
-            self._subscribers = self._subscribers.filter(function (cb) {
-                return cb !== callback;
+            const checkbox = row.querySelector(`#cb-${item.id}`);
+            checkbox?.addEventListener("change", (e) => {
+                // @ts-ignore
+                if (e.target?.checked) {
+                    this.selected[item.id] = true;
+                } else {
+                    delete this.selected[item.id];
+                }
+                this._notify();
             });
-        },
-    };
-};
 
-/**
- * @param {SearchResultItem} item
- * @returns {HTMLElement}
- */
-SelectCitationsComponent.prototype._buildDocElement = function (item) {
-    const self = this;
-    var root = document.createElement("div");
-    root.classList.add("doc");
-    var docInfo = document.createElement("div");
-    docInfo.classList.add("docInfo");
+            const quickBtn = row.querySelector(`#btn-quick-${item.id}`);
+            const quickMenu = row.querySelector(`#menu-quick-${item.id}`);
 
-    var checkHolder = document.createElement("div");
+            quickBtn?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                document.querySelectorAll(".quick-insert-menu").forEach(m => {
+                    if (m !== quickMenu) m.classList.add("hidden");
+                });
+                quickMenu?.classList.toggle("hidden");
+            });
 
-    let label = "";
-    if (item.author && item.author.length > 0) {
-        label = item.author
-            .map(function (a) {
-                if (a.family && a.given) {
-                    return a.family.trim() + ", " + a.given.trim();
-                } else if (a.family) {
-                    return a.family.trim();
-                } else if (a.given) {
-                    return a.given.trim();
-                }
-                return "";
-            })
-            .join("; ");
-    }
-    const arrow = document.createElement("div");
-    arrow.classList.add("selectbox-arrow");
-    arrow.innerHTML = "<b></b>";
+            quickMenu?.querySelectorAll(".menu-option").forEach(opt => {
+                opt.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    quickMenu.classList.add("hidden");
+                    const format = opt.getAttribute("data-format") || "parenthetical";
+                    window.dispatchEvent(new CustomEvent("mendeley:quickInsert", {
+                        detail: { item, format }
+                    }));
+                });
+            });
 
-    var title = document.createElement("div");
-    title.textContent = item.title.trim();
-    title.classList.add("truncate-text");
-    title.classList.add("secondary-text");
+            this.docsHolder.appendChild(row);
+        });
 
-    if (item.publisher || item["publisher-place"]) {
-        title.textContent +=
-            " · " + (item.publisher || item["publisher-place"] || "");
-    }
-    if (item.issued && item.issued["date-parts"]) {
-        var date = item.issued["date-parts"][0];
-        if (label.length > 20) {
-            title.textContent += " (" + date.join("-") + ")";
-        } else {
-            if (
-                label.length > 0 &&
-                label.slice(-1) !== "." &&
-                label.slice(-1) !== ","
-            )
-                label += ".";
-            label += " " + date.join("-");
-        }
-    }
-    if (label.length === 0) {
-        label = title.textContent;
-    }
-    title.setAttribute("title", title.textContent);
-    docInfo.appendChild(title);
-
-    const check = document.createElement("input");
-
-    checkHolder.appendChild(check);
-    const checkInput = new Checkbox(check, {
-        checked: !!this._items[item.id],
-        label: label,
-        title: true,
-        id: item.id,
-    });
-    if (this._items[item.id]) {
-        this._checks[item.id] = checkInput;
+        return res.items.length;
     }
 
-    checkHolder.appendChild(arrow);
-    root.appendChild(checkHolder);
-    root.appendChild(docInfo);
-
-    /** @type {DocumentFragment} */
-    let params;
-
-    function toggleItem() {
-        root.classList.toggle("doc-open");
-        if (!params) {
-            params = self._buildCitationParams(item);
-            root.appendChild(params);
-        }
+    removeItems(ids) {
+        ids.forEach(id => {
+            delete this.selected[id];
+        });
+        this._notify();
     }
-
-    arrow.onclick = toggleItem;
-    checkInput.subscribe(function (event) {
-        if (event.type !== "checkbox:change") {
-            return;
-        }
-        if (event.detail.checked) {
-            self._addSelected(item, checkInput);
-        } else {
-            self._removeSelected(item.id);
-        }
-    });
-
-    return root;
-};
-
-/**
- * @param {SearchResultItem} item
- * @returns {DocumentFragment}
- */
-SelectCitationsComponent.prototype._buildCitationParams = function (item) {
-    const locatorLabel = localStorage.getItem("selectedLocator") || "page";
-    item.label = locatorLabel;
-
-    const params = document.createDocumentFragment();
-    const prefixSuffixContainer = document.createElement("div");
-    const prefix = document.createElement("input");
-    const suffix = document.createElement("input");
-    const locatorContainer = document.createElement("div");
-    const locatorSelect = document.createElement("div");
-    const locator = document.createElement("input");
-    const omitAuthorContainer = document.createElement("div");
-    const omitAuthor = document.createElement("input");
-
-    params.appendChild(prefixSuffixContainer);
-    prefixSuffixContainer.appendChild(prefix);
-    prefixSuffixContainer.appendChild(suffix);
-
-    params.appendChild(locatorContainer);
-    locatorContainer.appendChild(locatorSelect);
-    locatorContainer.appendChild(locator);
-    let locatorPlaceholder = "";
-
-    params.appendChild(omitAuthorContainer);
-    omitAuthorContainer.appendChild(omitAuthor);
-
-    const prefixInput = new InputField(prefix, {
-        type: "text",
-        placeholder: "Prefix",
-    });
-    const suffixInput = new InputField(suffix, {
-        type: "text",
-        placeholder: "Suffix",
-    });
-    const locatorSelectbox = new SelectBox(locatorSelect, {
-        placeholder: "Locator",
-        usePortal: true,
-    });
-    LOCATOR_VALUES.forEach(function (info) {
-        const selected = info[0] === locatorLabel;
-        locatorSelectbox.addItem(info[0], info[1], selected);
-        if (selected) {
-            locatorPlaceholder = info[1];
-        }
-    });
-    const locatorInput = new InputField(locator, {
-        type: "text",
-        placeholder: locatorPlaceholder,
-    });
-    const omitAuthorInput = new Checkbox(omitAuthor, {
-        label: translate("Omit author"),
-    });
-
-    prefixInput.subscribe(function (event) {
-        if (event.type !== "inputfield:input") {
-            return;
-        }
-        item.prefix = event.detail.value;
-    });
-    suffixInput.subscribe(function (event) {
-        if (event.type !== "inputfield:input") {
-            return;
-        }
-        item.suffix = event.detail.value;
-    });
-    locatorInput.subscribe(function (event) {
-        if (event.type !== "inputfield:input") {
-            return;
-        }
-        item.locator = event.detail.value;
-    });
-
-    locatorSelectbox.subscribe(function (event) {
-        if (event.type !== "selectbox:change") {
-            return;
-        }
-        if (!event.detail.items) {
-            return;
-        }
-        const eventItem = event.detail.items[0];
-        locatorInput.setPlaceholder(eventItem.text);
-        item.label = event.detail.values[0].toString();
-        localStorage.setItem("selectedLocator", item.label);
-    });
-    omitAuthorInput.subscribe(function (event) {
-        if (event.type !== "checkbox:change") {
-            return;
-        }
-        item["suppress-author"] = event.detail.checked;
-    });
-
-    return params;
-};
-
-/**
- * @param {SearchResultItem} item
- * @returns {HTMLElement}
- */
-SelectCitationsComponent.prototype._buildSelectedElement = function (item) {
-    const self = this;
-    var root = document.createElement("div");
-    root.classList.add("selDoc");
-
-    const span = document.createElement("span");
-    if (item.author && item.author.length > 0) {
-        span.textContent = item.author
-            .map(function (a) {
-                return a.family + ", " + a.given;
-            })
-            .join("; ");
-    } else {
-        span.textContent = item.title;
-    }
-
-    if (item.issued && item.issued["date-parts"]) {
-        span.textContent += " " + item.issued["date-parts"][0].join("-");
-    }
-    span.setAttribute("title", span.textContent);
-    root.appendChild(span);
-
-    var remove = document.createElement("span");
-    remove.onclick = function () {
-        self._removeSelected(item.id);
-    };
-    remove.innerHTML =
-        '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M12.0718 4.6333L11.564 5.14404L10.5483 6.1665L8.70459 8.02002L10.3862 9.7124L11.4829' +
-        " 10.8149L12.0308 11.3667L11.3218 12.0718L10.7729 11.52L9.67725 10.4175L7.99951 8.729L6.32275" +
-        " 10.4165L5.22705 11.52L4.67822 12.0718L3.96924 11.3667L4.51709 10.8149L5.61377 9.7124L7.29443" +
-        " 8.02002L5.45166 6.1665L4.43604 5.14404L3.92822 4.6333L4.63721 3.92822L5.14502 4.43896L6.16162" +
-        ' 5.46143L7.99951 7.31104L9.83838 5.46143L10.855 4.43896L11.3628 3.92822L12.0718 4.6333Z"' +
-        ' fill="currentColor" fill-opacity="0.8"/></svg>';
-    root.appendChild(remove);
-
-    return root;
-};
-
-/**
- * @param {SearchResultItem} item
- * @param {Checkbox} checkbox
- */
-SelectCitationsComponent.prototype._addSelected = function (item, checkbox) {
-    /** @type {HTMLElement} */
-    var el = this._buildSelectedElement(item);
-    this._items[item.id] = item;
-    this._html[item.id] = el;
-    this._checks[item.id] = checkbox;
-    if (this._selectedHolder) {
-        this._selectedHolder.appendChild(el);
-    }
-    this._docsScroller.onscroll();
-    this._selectedScroller.onscroll();
-    this._checkSelected();
-};
-
-/**
- * @param {HTMLElement} holder - The element that contains the document list.
- * @param {HTMLElement} [thumb]
- */
-SelectCitationsComponent.prototype._checkDocsScroll = function (holder, thumb) {
-    const self = this;
-    if (this._fShouldLoadMore(holder)) {
-        if (this._loadTimeout) {
-            clearTimeout(this._loadTimeout);
-        }
-
-        if (
-            !this._lastSearch.obj &&
-            !this._lastSearch.text.trim() &&
-            !this._lastSearch.groups.length
-        )
-            return;
-
-        this._loadTimeout = setTimeout(function () {
-            if (self._fShouldLoadMore(holder)) {
-                self._fLoadMore();
-            }
-        }, 500);
-    }
-};
-
-/**
- * @param {HTMLElement} holder
- * @param {HTMLElement} thumb
- * @param {number} minThumbHeight
- * @param {function(HTMLElement): void} [onscroll]
- * @returns {Scroller}
- */
-SelectCitationsComponent.prototype._initScrollBox = function (
-    holder,
-    thumb,
-    minThumbHeight,
-    onscroll
-) {
-    var scroller = {};
-    scroller.onscroll = this._checkScroll(
-        holder,
-        thumb,
-        minThumbHeight,
-        onscroll
-    );
-
-    holder.onwheel = function (e) {
-        holder.scrollTop +=
-            e.deltaY > 10 || e.deltaY < -10 ? e.deltaY : e.deltaY * 20;
-        scroller.onscroll();
-    };
-
-    thumb.onmousedown = function (e) {
-        thumb.classList.add("scrolling");
-        var y = e.clientY;
-        var initialPos = holder.scrollTop;
-
-        window.onmouseup = function (e) {
-            thumb.classList.remove("scrolling");
-            window.onmouseup = null;
-            window.onmousemove = null;
-        };
-        window.onmousemove = function (e) {
-            var delta = e.clientY - y;
-
-            var percMoved = delta / holder.clientHeight;
-            var deltaScroll = holder.scrollHeight * percMoved;
-            holder.scrollTop = initialPos + deltaScroll;
-
-            scroller.onscroll();
-        };
-    };
-
-    document.body.addEventListener("resize", function () {
-        scroller.onscroll();
-    });
-
-    return scroller;
-};
-
-/**
- * @param {HTMLElement} holder
- * @param {HTMLElement} thumb
- * @param {number} minThumbHeight
- * @param {function} [func] - an optional function to be called with the holder and thumb as arguments.
- * @returns {function} - a function that checks the scroll state and updates the thumb accordingly.
- * */
-SelectCitationsComponent.prototype._checkScroll = function (
-    holder,
-    thumb,
-    minThumbHeight,
-    func
-) {
-    const displayNoneClass = this._displayNoneClass;
-    return function () {
-        if (holder.scrollHeight <= holder.clientHeight) {
-            thumb.classList.add(displayNoneClass);
-        } else {
-            thumb.classList.remove(displayNoneClass);
-            var height =
-                (holder.clientHeight / holder.scrollHeight) *
-                holder.clientHeight;
-            height = height < minThumbHeight ? minThumbHeight : height;
-            thumb.style.height = height + "px";
-
-            var scroll = holder.scrollHeight - holder.clientHeight;
-            var percScrolled = holder.scrollTop / scroll;
-
-            var margin = percScrolled * (holder.clientHeight - height);
-            thumb.style.marginTop = margin + "px";
-        }
-
-        if (func) func(holder, thumb);
-    };
-};
-
-/** @param {string|number} id */
-SelectCitationsComponent.prototype._removeSelected = function (id) {
-    var el = this._html[id];
-    if (this._selectedHolder) {
-        this._selectedHolder.removeChild(el);
-    }
-
-    delete this._items[id];
-    delete this._html[id];
-    if (this._checks[id]) {
-        this._checks[id].uncheck(true);
-        delete this._checks[id];
-    }
-
-    this._docsScroller.onscroll();
-    this._selectedScroller.onscroll();
-    this._checkSelected();
-};
-
-SelectCitationsComponent.prototype._checkSelected = function () {
-    const numOfSelected = this.count();
-    if (!this._selectedInfo || !this._selectedCount || !this._selectedWrapper) {
-        return;
-    }
-    if (numOfSelected <= 0) {
-        this._selectedWrapper.classList.add(this._displayNoneClass);
-        this._selectedInfo.classList.add(this._displayNoneClass);
-    } else {
-        this._selectedWrapper.classList.remove(this._displayNoneClass);
-        this._selectedInfo.classList.remove(this._displayNoneClass);
-        this._selectedCount.textContent =
-            numOfSelected + " " + translate("selected");
-    }
-    this._subscribers.forEach(function (cb) {
-        cb(numOfSelected);
-    });
-};
-
-SelectCitationsComponent.prototype.count = function () {
-    var k = 0;
-    for (var i in this._items) k++;
-    return k;
-};
+}
 
 export { SelectCitationsComponent };
