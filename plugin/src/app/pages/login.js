@@ -23,24 +23,6 @@ class LoginPage {
      */
     constructor(router) {
         this._router = router;
-
-        this._tokenField = new InputField("tokenField", {
-            autofocus: true,
-            autocomplete: "off",
-        });
-
-        this._connectTokenBtn = new Button("connectTokenBtn", {
-            variant: "primary",
-        });
-
-        this._getBrowserTokenBtn = document.getElementById("getBrowserTokenBtn");
-        this._demoModeBtn = document.getElementById("demoModeBtn");
-
-        this._loginMessage = new Message("loginMessage", {
-            type: "error",
-        });
-
-        this._logoutLink = document.getElementById("logoutLink");
         this._onAuthorized = function () {};
         this._onOpen = function () {};
     }
@@ -48,7 +30,7 @@ class LoginPage {
     init() {
         const self = this;
         logger.info("LOGIN_INIT", { message: "Initializing Mendeley Login Page" });
-        this._addEventListeners();
+        this._bindDirectDOMEvents();
 
         const triggers = {
             /** @param {function(): void} callbackFn */
@@ -80,65 +62,43 @@ class LoginPage {
         return triggers;
     }
 
-    onAuthCallback(answer, state) {
-        this._saveToken(answer);
-        this._onAuthorized();
-        this._hide();
-        return true;
-    }
-
-    getAuthFlow() {
-        const self = this;
-        return {
-            authenticate: () => {
-                this._show();
-            },
-            getToken: function () {
-                return self._getToken();
-            },
-            refreshToken: function () {
-                return false;
-            },
-        };
-    }
-
-    _addEventListeners() {
+    _bindDirectDOMEvents() {
         const self = this;
 
-        this._tokenField.subscribe(function (event) {
-            if (event.type === "inputfield:submit") {
-                self._applyManualToken();
-            }
-        });
-
-        this._connectTokenBtn.subscribe(function (event) {
-            if (event.type === "button:click") {
-                self._applyManualToken();
-            }
-        });
-
-        if (this._getBrowserTokenBtn) {
-            this._getBrowserTokenBtn.onclick = function (e) {
+        const btnBrowser = document.getElementById("getBrowserTokenBtn");
+        if (btnBrowser) {
+            btnBrowser.onclick = function (e) {
                 e.preventDefault();
                 self._openInAppModalAuth();
             };
         }
 
-        if (this._demoModeBtn) {
-            this._demoModeBtn.onclick = function (e) {
+        const btnDemo = document.getElementById("demoModeBtn");
+        if (btnDemo) {
+            btnDemo.onclick = function (e) {
                 e.preventDefault();
                 self._startDemoMode();
             };
         }
 
-        if (this._logoutLink) {
-            this._logoutLink.onclick = function () {
-                logger.info("USER_LOGOUT", {});
+        const btnConnect = document.getElementById("connectTokenBtn");
+        const tokenInput = document.getElementById("tokenField");
+        if (btnConnect && tokenInput) {
+            btnConnect.onclick = function (e) {
+                e.preventDefault();
+                // @ts-ignore
+                const raw = tokenInput.value || "";
+                self._applyManualToken(raw);
+            };
+        }
+
+        const logout = document.getElementById("logoutLink");
+        if (logout) {
+            logout.onclick = function (e) {
+                e.preventDefault();
                 localStorage.removeItem("mendToken");
                 localStorage.removeItem("mendTokenExpiresAt");
-                Loader.hide();
                 self._show();
-                return true;
             };
         }
     }
@@ -161,28 +121,18 @@ class LoginPage {
             self._onAuthorized();
         }, (err) => {
             logger.error("AUTH_ERROR", { err });
-            self._loginMessage.show(translate("Authentication failed or cancelled"));
         });
     }
 
-    _applyManualToken() {
-        const rawToken = this._tokenField.getValue().trim();
-        if (!rawToken) {
-            this._loginMessage.show(translate("Please paste an Access Token"));
-            return;
-        }
-        let cleanToken = rawToken;
-        if (cleanToken.startsWith("Bearer ")) {
-            cleanToken = cleanToken.slice(7).trim();
-        }
+    _applyManualToken(raw) {
+        if (!raw || !raw.trim()) return;
+        let cleanToken = raw.trim();
+        if (cleanToken.startsWith("Bearer ")) cleanToken = cleanToken.slice(7).trim();
         if (cleanToken.includes("access_token=")) {
             const match = cleanToken.match(/access_token=([^&]+)/);
-            if (match && match[1]) {
-                cleanToken = match[1];
-            }
+            if (match && match[1]) cleanToken = match[1];
         }
 
-        logger.info("MANUAL_TOKEN_SUBMITTED", { tokenLength: cleanToken.length });
         this._saveToken(cleanToken);
         this._hide();
         this._onAuthorized();
@@ -191,13 +141,11 @@ class LoginPage {
     _hide() {
         Loader.hide();
         this._router.openMain();
-        if (this._logoutLink) this._logoutLink.classList.remove("hidden");
     }
 
     _show() {
         Loader.hide();
         this._router.openLogin();
-        if (this._logoutLink) this._logoutLink.classList.add("hidden");
     }
 
     _getToken() {
@@ -212,6 +160,15 @@ class LoginPage {
     _saveToken(token) {
         localStorage.setItem("mendToken", token);
         localStorage.setItem("mendTokenExpiresAt", String(Date.now() + (30 * 24 * 60 * 60 * 1000)));
+    }
+
+    getAuthFlow() {
+        const self = this;
+        return {
+            authenticate: () => this._show(),
+            getToken: () => self._getToken(),
+            refreshToken: () => false,
+        };
     }
 }
 

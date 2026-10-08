@@ -26,20 +26,11 @@ class AuthModalManager {
             }
         };
 
-        // @ts-ignore
-        window.OAuthError = function (err) {
-            if (typeof onError === "function") onError(err);
-        };
-
-        // Method 1: Ask ONLYOFFICE host editor to open browser via executeMethod
+        // Open in browser
         try {
-            if (window.Asc && window.Asc.plugin && typeof window.Asc.plugin.executeMethod === "function") {
-                window.Asc.plugin.executeMethod("OpenUrl", [authUrl]);
-            } else {
-                window.open(authUrl, "_blank");
-            }
-        } catch (e) {
             window.open(authUrl, "_blank");
+        } catch (e) {
+            console.error("Window open error:", e);
         }
 
         // Active clipboard & storage watcher
@@ -53,26 +44,7 @@ class AuthModalManager {
                 return;
             }
 
-            // Read clipboard automatically
-            if (navigator.clipboard && typeof navigator.clipboard.readText === "function") {
-                navigator.clipboard.readText().then((text) => {
-                    if (text && (text.includes("access_token=") || text.startsWith("MSw"))) {
-                        let clean = text.trim();
-                        if (clean.includes("access_token=")) {
-                            const match = clean.match(/access_token=([^&]+)/);
-                            if (match && match[1]) clean = match[1];
-                        }
-                        if (clean.length > 30) {
-                            clearInterval(timer);
-                            localStorage.setItem("mendToken", clean);
-                            localStorage.setItem("mendTokenExpiresAt", String(Date.now() + (30 * 24 * 60 * 60 * 1000)));
-                            if (typeof onSuccess === "function") onSuccess(clean);
-                        }
-                    }
-                }).catch(() => {});
-            }
-
-            if (checksCount > 180) { // 3 minutes timeout
+            if (checksCount > 180) {
                 clearInterval(timer);
             }
         }, 1000);

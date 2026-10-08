@@ -10,21 +10,6 @@
     <link rel="stylesheet" href="dist/styles.css">
     <style id="componentsStyles"></style>
     <style id="pluginStyles"></style>
-    <script src="vendor/v1/plugins.js"></script>
-    <script src="vendor/v1/plugins-ui.js"></script>
-    <script src="vendor/mendeley-sdk/standalone.min.js"></script>
-    <script src="vendor/citeproc/citeproc_commonjs.js"></script>
-    <script>
-        if (typeof Promise === 'function' && typeof Promise.any === 'function') {
-            document.write(
-                '<script type="module" src="dist/bundle.modern.js"><\/script>'
-            );
-        } else {
-            document.write(
-                '<script src="dist/bundle.es5.js"><\/script>'
-            );
-        }
-    </script>
 </head>
 <body spellcheck="false" class="noselect">
     <div id="errorWrapper" class="errorMsg hidden"></div>
@@ -116,5 +101,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Scripts loaded synchronously in predictable order -->
+    <script src="vendor/v1/plugins.js"></script>
+    <script src="vendor/v1/plugins-ui.js"></script>
+    <script src="vendor/citeproc/citeproc_commonjs.js"></script>
+    <script src="dist/bundle.modern.js"></script>
 </body>
 </html>
