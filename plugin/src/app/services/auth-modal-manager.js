@@ -26,7 +26,51 @@ class AuthModalManager {
             }
         };
 
-        // Try ONLYOFFICE executeMethod OpenUrl first
+        // Open native ONLYOFFICE modal dialog using window.Asc.PluginWindow
+        try {
+            if (window.Asc && window.Asc.PluginWindow) {
+                const authWindow = new window.Asc.PluginWindow();
+                /** @type {any} */
+                const variation = {
+                    name: "Mendeley Sign In",
+                    url: authUrl,
+                    description: "Sign in with Mendeley Account",
+                    isVisual: true,
+                    isModal: true,
+                    EditorsSupport: ["word", "cell", "slide", "pdf"],
+                    size: [600, 700],
+                    isViewer: false,
+                    isDisplayedInViewer: false,
+                    isInsideMode: false,
+                    buttons: [
+                        {
+                            text: "Close",
+                            primary: false
+                        }
+                    ]
+                };
+
+                // Catch window messages (e.g. from OAuth redirect)
+                if (typeof authWindow.attachEvent === "function") {
+                    authWindow.attachEvent("onWindowMessage", function(message) {
+                        if (message && message.token) {
+                            localStorage.setItem("mendToken", message.token);
+                            localStorage.setItem("mendTokenExpiresAt", String(Date.now() + (30 * 24 * 60 * 60 * 1000)));
+                            if (typeof onSuccess === "function") onSuccess(message.token);
+                            if (typeof window.Asc.plugin.executeMethod === "function") {
+                                window.Asc.plugin.executeMethod("CloseWindow", [authWindow.id]);
+                            }
+                        }
+                    });
+                }
+
+                authWindow.show(variation);
+            }
+        } catch (e) {
+            console.warn("PluginWindow modal open failed:", e);
+        }
+
+        // Also trigger OpenUrl for external browser fallback
         try {
             if (window.Asc && window.Asc.plugin && typeof window.Asc.plugin.executeMethod === "function") {
                 window.Asc.plugin.executeMethod("OpenUrl", [authUrl]);
@@ -35,27 +79,7 @@ class AuthModalManager {
             console.warn("Asc.plugin.executeMethod OpenUrl failed:", e);
         }
 
-        // Try direct window.open
-        try {
-            window.open(authUrl, "_blank");
-        } catch (e) {
-            console.warn("window.open failed:", e);
-        }
-
-        // Fallback: create dynamic anchor link with target="_blank" and click it
-        try {
-            const a = document.createElement("a");
-            a.href = authUrl;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } catch (e) {
-            console.warn("anchor click failed:", e);
-        }
-
-        // Active storage watcher for token from OAuth redirect page
+        // Active storage watcher for token
         let checksCount = 0;
         const timer = setInterval(() => {
             checksCount++;
