@@ -157,30 +157,24 @@ import "../styles.css";
             .onAuthorized(function () {
                 if (isInit) return;
                 isInit = true;
-                Loader.show();
+                Loader.hide();
+                
+                router.openMain();
 
                 let loadGroupsPromise = loadGroups().catch((e) => {
-                    console.error(e);
-                    showError(translate("An error occurred while loading library groups. Try restarting the plugin."));
+                    console.warn("loadGroups non-fatal error:", e);
                 });
                 let initSettingsPromise = settings.init().catch((e) => {
-                    console.error(e);
-                    showError(translate("An error occurred while loading settings. Try restarting the plugin."));
-                    settings.show();
+                    console.warn("settings.init non-fatal error:", e);
                 });
 
-                const timeoutGuard = new Promise((resolve) => setTimeout(resolve, 5000));
-                
-                Promise.race([
-                    Promise.all([
-                        loadGroupsPromise,
-                        initSettingsPromise,
-                        citationService.checkOldVersion().catch(() => false),
-                        showCitationsAtTheStartFromMyLibrary().catch(() => 0)
-                    ]),
-                    timeoutGuard
-                ]).then(function (res) {
-                    if (Array.isArray(res) && res[2]) {
+                Promise.all([
+                    loadGroupsPromise,
+                    initSettingsPromise,
+                    citationService.checkOldVersion().catch(() => false),
+                    showCitationsAtTheStartFromMyLibrary().catch(() => 0)
+                ]).then(function ([g, s, isUpdateOldVersion, c]) {
+                    if (isUpdateOldVersion) {
                         settings.show();
                     } else {
                         addContextMenuButtons();
