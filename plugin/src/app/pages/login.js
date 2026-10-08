@@ -17,7 +17,7 @@ import { translate } from "../services";
 import { logger } from "../services/logger-service";
 
 // Canonical Public Client ID for OnlyOffice Mendeley Integration
-const DEFAULT_CLIENT_ID = "2441";
+const DEFAULT_CLIENT_ID = "XPbozfRNSyo72orH";
 const DEFAULT_REDIRECT_URI = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
 
 class LoginPage {
