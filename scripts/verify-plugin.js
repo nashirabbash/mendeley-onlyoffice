@@ -11,6 +11,7 @@ const flatpakPluginPath = path.join(
 );
 
 const pluginPath = fs.existsSync(flatpakPluginPath) ? flatpakPluginPath : defaultPluginPath;
+const archivePath = path.resolve(process.cwd(), "mendeley.plugin");
 
 console.log("=== RUNNING MENDELEY PLUGIN INTEGRITY TESTS ===");
 console.log("Plugin test target:", pluginPath);
@@ -62,4 +63,14 @@ if (!DEMO_DOCUMENTS || DEMO_DOCUMENTS.length === 0) {
 }
 console.log(`✔ [CHECK 5] Offline demo dataset contains ${DEMO_DOCUMENTS.length} references and ${DEMO_GROUPS.length} folders`);
 
-console.log("\nALL 5 INTEGRATION CHECKS PASSED SUCCESSFULLY!");
+// 6. Verify Package Archive Integrity
+if (!fs.existsSync(archivePath)) {
+    throw new Error("mendeley.plugin does not exist!");
+}
+const stats = fs.statSync(archivePath);
+if (stats.size < 1000000) { // Should be ~2 MB
+    throw new Error(`mendeley.plugin is too small or truncated: ${stats.size} bytes`);
+}
+console.log(`✔ [CHECK 6] mendeley.plugin release archive intact: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
+
+console.log("\nALL 6 INTEGRATION CHECKS PASSED SUCCESSFULLY!");
