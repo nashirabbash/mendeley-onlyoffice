@@ -357,7 +357,7 @@ class St {
     return this._log(j.SUCCESS, t, i);
   }
 }
-var U = new St(), Ct = "https://api.mendeley.com";
+var G = new St(), Ct = "https://api.mendeley.com";
 class It {
   /** @param {{authFlow: any}} authFlow */
   constructor(t) {
@@ -365,7 +365,7 @@ class It {
     try {
       typeof MendeleySDK == "function" && (this._mendeleySdk = MendeleySDK(t));
     } catch (i) {
-      U.warn("SDK_INIT_FALLBACK", {
+      G.warn("SDK_INIT_FALLBACK", {
         message: i.message
       });
     }
@@ -387,7 +387,7 @@ class It {
         Authorization: "Bearer ".concat(r),
         Accept: "application/vnd.mendeley-document.1+json"
       }, s.headers || {}), l = t.startsWith("http") ? t : "".concat(Ct).concat(t);
-      U.info("FETCH_API_REQUEST", {
+      G.info("FETCH_API_REQUEST", {
         url: l
       });
       var h = new AbortController(), f = setTimeout(() => h.abort(), 1e4);
@@ -398,7 +398,7 @@ class It {
         }));
         if (clearTimeout(f), !_.ok) {
           var d = yield _.text().catch(() => "");
-          throw U.error("FETCH_API_ERROR", {
+          throw G.error("FETCH_API_ERROR", {
             status: _.status,
             statusText: _.statusText,
             text: d
@@ -406,7 +406,7 @@ class It {
         }
         return yield _.json();
       } catch (p) {
-        throw clearTimeout(f), U.error("FETCH_API_EXCEPTION", {
+        throw clearTimeout(f), G.error("FETCH_API_EXCEPTION", {
           message: p.message
         }), p;
       }
@@ -423,7 +423,7 @@ class It {
     var s = this;
     return S(function* () {
       if (s._isDemoMode()) {
-        U.info("FETCHING_DEMO_ITEMS", {
+        G.info("FETCHING_DEMO_ITEMS", {
           search: t,
           count: Ie.length
         });
@@ -445,13 +445,13 @@ class It {
           h = yield s._fetch("/search/documents?query=".concat(f, "&limit=20&view=bib"));
         } else i && i.length ? (h = yield Promise.all(i.map((d) => s._fetch("/documents/".concat(d, "?view=bib")).catch(() => null))), h = h.filter(Boolean)) : h = yield s._fetch("/documents?limit=25&view=bib&sort=last_modified&order=desc");
         var _ = Array.isArray(h) ? h : h.items || [];
-        return _.forEach(ce.transform.bind(ce)), U.success("FETCHED_DOCUMENTS_SUCCESS", {
+        return _.forEach(ce.transform.bind(ce)), G.success("FETCHED_DOCUMENTS_SUCCESS", {
           count: _.length
         }), {
           items: _
         };
       } catch (d) {
-        return U.error("GET_ITEMS_FAILED", {
+        return G.error("GET_ITEMS_FAILED", {
           message: d.message
         }), {
           items: []
@@ -477,7 +477,7 @@ class It {
           items: o
         };
       } catch (l) {
-        return U.error("GET_GROUP_ITEMS_FAILED", {
+        return G.error("GET_GROUP_ITEMS_FAILED", {
           message: l.message
         }), {
           items: []
@@ -505,7 +505,7 @@ class It {
           name: n.name
         })) : [];
       } catch (n) {
-        return U.warn("GET_USER_GROUPS_FAILED", {
+        return G.warn("GET_USER_GROUPS_FAILED", {
           message: n.message
         }), [];
       }
@@ -876,7 +876,7 @@ it.prototype = {
     }).join(" ");
   }
 };
-function Oe(e, t) {
+function Ne(e, t) {
   if (typeof e == "string") {
     var i = document.getElementById(e);
     i instanceof HTMLElement && (e = i);
@@ -887,8 +887,8 @@ function Oe(e, t) {
     throw new Error("Invalid container element");
   this._options = Object.assign(this._options, t), this._isShow = !1;
 }
-Oe.prototype = {
-  constructor: Oe,
+Ne.prototype = {
+  constructor: Ne,
   _options: {
     type: "info",
     text: "",
@@ -988,7 +988,7 @@ Oe.prototype = {
     }
   }
 };
-function Ne(e, t) {
+function Oe(e, t) {
   var i = this;
   if (typeof e == "string") {
     var n = document.getElementById(e);
@@ -1019,9 +1019,9 @@ function Ne(e, t) {
     }
   }, this._createDOM(), this._bindEvents(), this.updateState();
 }
-Ne.prototype = /** @lends Button.prototype */
+Oe.prototype = /** @lends Button.prototype */
 {
-  constructor: Ne,
+  constructor: Oe,
   /**
    * @type {HTMLButtonElement}
    */
@@ -1562,7 +1562,7 @@ rt.prototype = {
   }
 };
 var y = /* @__PURE__ */ new WeakSet();
-class Ue {
+class Ve {
   /**
    * @param {string | HTMLSelectElement | HTMLElement} selectbox
    * @param {SelectboxOptionsType} options
@@ -1600,10 +1600,10 @@ class Ue {
         s.target instanceof HTMLElement && !this._container.contains(s.target) && !s.target.classList.contains("selectbox-option") && c(y, this, J).call(this);
       },
       keydown: (s) => {
-        c(y, this, Ot).call(this, s);
+        c(y, this, Nt).call(this, s);
       },
       dropdownClick: (s) => {
-        c(y, this, Nt).call(this, s);
+        c(y, this, Ot).call(this, s);
       },
       scrollCheck: () => {
         if (this._headerRectOnOpen) {
@@ -1886,7 +1886,7 @@ function ot(e) {
     c(y, this, ne).call(this), c(y, this, _e).call(this, t, !0), c(y, this, Te).call(this, i.value, !0);
   }
 }
-function Ot(e) {
+function Nt(e) {
   var t = e.key || e.keyCode;
   switch (t) {
     case "Enter":
@@ -1915,8 +1915,8 @@ function _e(e, t) {
   if (e = e || "", !!this._optionsContainer) {
     this._optionsContainer.innerHTML = "";
     var i = null, n = this._items;
-    e && (n = n.filter(function(N) {
-      return N !== null && N.text.toLowerCase().indexOf(e) !== -1;
+    e && (n = n.filter(function(O) {
+      return O !== null && O.text.toLowerCase().indexOf(e) !== -1;
     }));
     for (var s = document.createDocumentFragment(), r = 0; r < n.length; r++) {
       var o = n[r];
@@ -1956,12 +1956,12 @@ function _e(e, t) {
         i.scrollIntoView && i.scrollIntoView({
           block: "nearest"
         });
-      } catch (N) {
-        console.error(N);
+      } catch (O) {
+        console.error(O);
       }
   }
 }
-function Nt(e) {
+function Ot(e) {
   var t = e.target || e.srcElement, i = null;
   if (t && t instanceof HTMLElement) {
     for (var n = null, s = t.className.split(" "), r = !1, o = 0; o < s.length; o++)
@@ -2117,7 +2117,107 @@ function Bt(e) {
     s.classList.add("loader-title"), s.classList.add("i18n"), s.innerText = e, a($, this).appendChild(s);
   }
 }
-function G(e) {
+var Ht = "26014", Ft = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
+class Rt {
+  static openModalAuth(t, i) {
+    var n = Date.now().toString(), s = "https://api.mendeley.com/oauth/authorize?client_id=".concat(Ht, "&redirect_uri=").concat(encodeURIComponent(Ft), "&response_type=token&scope=all&state=").concat(n);
+    window.OAuthCallback = function(l, h) {
+      l && (localStorage.setItem("mendToken", l), localStorage.setItem("mendTokenExpiresAt", String(Date.now() + 720 * 60 * 60 * 1e3)), typeof t == "function" && t(l));
+    };
+    try {
+      window.open(s, "_blank");
+    } catch (l) {
+      console.error("Window open error:", l);
+    }
+    var r = 0, o = setInterval(() => {
+      r++;
+      var l = localStorage.getItem("mendToken");
+      if (l && l !== "DEMO_MODE_TOKEN") {
+        clearInterval(o), typeof t == "function" && t(l);
+        return;
+      }
+      r > 180 && clearInterval(o);
+    }, 1e3);
+  }
+}
+class Vt {
+  /**
+   * @param {any} router
+   */
+  constructor(t) {
+    this._router = t, this._onAuthorized = function() {
+    }, this._onOpen = function() {
+    };
+  }
+  init() {
+    var t = this;
+    G.info("LOGIN_PAGE_INIT", {}), window.onSignInClick = function() {
+      G.info("CLICK_SIGN_IN", {}), t._openInAppModalAuth();
+    }, window.onDemoModeClick = function() {
+      G.info("CLICK_DEMO_MODE", {}), t._startDemoMode();
+    }, window.onConnectTokenClick = function() {
+      var s = (
+        /** @type {HTMLInputElement} */
+        document.getElementById("tokenField")
+      );
+      s && s.value && t._applyManualToken(s.value);
+    };
+    var i = {
+      onOpen: function(r) {
+        return t._onOpen = r, i;
+      },
+      onAuthorized: function(r) {
+        return t._onAuthorized = r, i;
+      }
+    }, n = this._getToken();
+    return n ? (G.info("CACHED_TOKEN_FOUND", {}), t._hide(), setTimeout(() => t._onAuthorized(), 0), i) : (t._show(), setTimeout(() => {
+      we.hide(), t._onOpen();
+    }, 0), i);
+  }
+  _startDemoMode() {
+    this._saveToken("DEMO_MODE_TOKEN"), this._hide(), this._onAuthorized();
+  }
+  _openInAppModalAuth() {
+    var t = this;
+    Rt.openModalAuth((i) => {
+      t._saveToken(i), t._hide(), t._onAuthorized();
+    }, (i) => {
+      console.error("Auth error:", i);
+    });
+  }
+  _applyManualToken(t) {
+    if (!(!t || !t.trim())) {
+      var i = t.trim();
+      if (i.startsWith("Bearer ") && (i = i.slice(7).trim()), i.includes("access_token=")) {
+        var n = i.match(/access_token=([^&]+)/);
+        n && n[1] && (i = n[1]);
+      }
+      this._saveToken(i), this._hide(), this._onAuthorized();
+    }
+  }
+  _hide() {
+    we.hide(), this._router.openMain();
+  }
+  _show() {
+    we.hide(), this._router.openLogin();
+  }
+  _getToken() {
+    var t = localStorage.getItem("mendToken"), i = localStorage.getItem("mendTokenExpiresAt");
+    return !t || !i || Date.now() > Number(i) ? null : t;
+  }
+  _saveToken(t) {
+    localStorage.setItem("mendToken", t), localStorage.setItem("mendTokenExpiresAt", String(Date.now() + 720 * 60 * 60 * 1e3));
+  }
+  getAuthFlow() {
+    var t = this;
+    return {
+      authenticate: () => this._show(),
+      getToken: () => t._getToken(),
+      refreshToken: () => !1
+    };
+  }
+}
+function U(e) {
   try {
     return window.Asc.plugin.tr(e);
   } catch (t) {
@@ -2125,7 +2225,7 @@ function G(e) {
   }
 }
 var Ae = /* @__PURE__ */ new WeakMap(), Q = /* @__PURE__ */ new WeakMap(), L = /* @__PURE__ */ new WeakSet();
-class Ht {
+class Ut {
   /**
    * @param {string} citPrefix
    * @param {string} bibPrefix
@@ -2171,7 +2271,7 @@ class Ht {
           return Asc.scope.bAddNote && (_.AddText(""), _.Select()), _.GetInternalId();
         }, !1, !1, h);
       });
-      return o && (yield c(L, s, Ve).call(s, n)), yield c(L, s, de).call(s, t), l;
+      return o && (yield c(L, s, Ue).call(s, n)), yield c(L, s, de).call(s, t), l;
     })();
   }
   /**
@@ -2182,7 +2282,7 @@ class Ht {
     var i = this;
     return S(function* () {
       try {
-        for (var n = yield c(L, i, Rt).call(i), s = [], r = [], o = 0; o < n.length; o++) {
+        for (var n = yield c(L, i, Wt).call(i), s = [], r = [], o = 0; o < n.length; o++) {
           var l = n[o], h = l.Tag.indexOf(a(Ae, i)) !== -1, f = l.Tag.indexOf(a(Q, i)) !== -1;
           (h || f) && (s.push(l), r.push(l.InternalId));
         }
@@ -2194,8 +2294,8 @@ class Ht {
             if (b !== -1) {
               var B;
               Asc.scope.useParagraph ? B = A.GetParentParagraph() : B = A.GetRange(0, Number.MAX_SAFE_INTEGER);
-              var N = B.GetText();
-              N = N.trim(), p[b] = N;
+              var O = B.GetText();
+              O = O.trim(), p[b] = O;
             }
           }), p;
         }, !1, !1, d));
@@ -2215,7 +2315,7 @@ class Ht {
     var t = this;
     return S(function* () {
       try {
-        var i = yield c(L, t, Ft).call(t);
+        var i = yield c(L, t, Gt).call(t);
         return i.length && (i = i.filter((n) => n.Value.indexOf("CSL_CITATION") === 0 || n.Value.indexOf("Mendeley Bibliography") === 0)), i;
       } catch (n) {
         return console.error(n), [];
@@ -2359,7 +2459,7 @@ class Ht {
         var h = yield c(L, i, We).call(i, l.InternalId);
         if (!h)
           return console.error("Can not select content control with id: " + l.InternalId), 0;
-        yield c(L, i, Ut).call(i), yield new Promise((_) => {
+        yield c(L, i, Dt).call(i), yield new Promise((_) => {
           Asc.scope.tag = l.Tag, Asc.plugin.callCommand(() => {
             var d = Api.GetDocument(), p = d.GetCurrentContentControl();
             p ? p.SetTag(Asc.scope.tag) : console.error("Can not find content control");
@@ -2389,7 +2489,7 @@ class Ht {
             var p = Api.GetDocument(), m = p.GetCurrentContentControl();
             m ? m.SetTag(Asc.scope.tag) : console.error("Can not find content control");
           }, !1, !1, d);
-        }), yield c(L, n, Ge).call(n), yield c(L, n, Ve).call(n, i);
+        }), yield c(L, n, Ge).call(n), yield c(L, n, Ue).call(n, i);
         var _ = h.PlaceHolderText;
         yield c(L, n, de).call(n, _);
       }, r, o = 0; o < t.length; o++)
@@ -2416,7 +2516,7 @@ class Ht {
             var d = Api.GetDocument(), p = d.GetCurrentContentControl();
             p ? p.SetTag(Asc.scope.tag) : console.error("Can not find content control");
           }, !1, !1, _);
-        }), h.PlaceHolderText && (yield c(L, n, Ge).call(n), yield c(L, n, Ve).call(n, i), yield c(L, n, de).call(n, h.PlaceHolderText));
+        }), h.PlaceHolderText && (yield c(L, n, Ge).call(n), yield c(L, n, Ue).call(n, i), yield c(L, n, de).call(n, h.PlaceHolderText));
       }, r, o = 0; o < t.length; o++)
         r = yield* s();
     })();
@@ -2441,7 +2541,7 @@ function Ee(e, t) {
     typeof t != "number" && (t = 2), window.Asc.plugin.executeMethod("AddContentControl", [t, e], i);
   });
 }
-function Ve(e) {
+function Ue(e) {
   return Asc.scope.notesStyle = e, new Promise((t) => {
     Asc.plugin.callCommand(() => {
       var i = Api.GetDocument();
@@ -2449,12 +2549,12 @@ function Ve(e) {
     }, !1, !1, t);
   });
 }
-function Ft() {
+function Gt() {
   return new Promise(function(e, t) {
     window.Asc.plugin.executeMethod("GetAllAddinFields", void 0, e);
   });
 }
-function Rt() {
+function Wt() {
   return new Promise(function(e, t) {
     window.Asc.plugin.executeMethod("GetAllContentControls", void 0, e);
   });
@@ -2488,7 +2588,7 @@ function We(e) {
     }, !1, !1, t);
   });
 }
-function Ut() {
+function Dt() {
   return new Promise(function(e) {
     var t = !1, i = !1;
     Asc.plugin.callCommand(() => {
@@ -2534,7 +2634,7 @@ function qe() {
   }), qe.apply(this, arguments);
 }
 var se = /* @__PURE__ */ new WeakMap(), z = /* @__PURE__ */ new WeakMap(), D = /* @__PURE__ */ new WeakMap(), dt = /* @__PURE__ */ new WeakSet();
-class Vt {
+class zt {
   constructor() {
     re(this, dt), T(this, se, void 0), T(this, z, void 0), T(this, D, void 0), E(se, this, []), E(z, this, []), E(D, this, []), this.size = 0;
   }
@@ -2588,7 +2688,7 @@ class Vt {
    */
   addCslCitation(t) {
     return a(D, this).push(t), t.setNoteIndex(a(D, this).length), t.getCitationItems().forEach((i) => {
-      c(dt, this, Gt).call(this, i.id, i);
+      c(dt, this, Kt).call(this, i.id, i);
     }), this;
   }
   getAllCitationsInJson() {
@@ -2628,7 +2728,7 @@ class Vt {
     return i;
   }
 }
-function Gt(e, t) {
+function Kt(e, t) {
   e = e.toString();
   var i = a(z, this).indexOf(e);
   return i >= 0 ? (a(se, this)[i] = t, this) : (a(se, this).push(t), a(z, this).push(e), this.size++, this);
@@ -3043,7 +3143,7 @@ class ve {
    * @returns
    */
   fillFromObject(t) {
-    return Object.hasOwnProperty.call(t, "properties") || Object.hasOwnProperty.call(t, "manualOverride") || Object.hasOwnProperty.call(t, "schema") ? c(H, this, Wt).call(this, t) : Object.hasOwnProperty.call(t, "citationItems") ? c(H, this, Dt).call(this, t) : Object.hasOwnProperty.call(t, "version") && Object.hasOwnProperty.call(t, "library") ? c(H, this, zt).call(this, t) : c(H, this, vt).call(this, t);
+    return Object.hasOwnProperty.call(t, "properties") || Object.hasOwnProperty.call(t, "manualOverride") || Object.hasOwnProperty.call(t, "schema") ? c(H, this, qt).call(this, t) : Object.hasOwnProperty.call(t, "citationItems") ? c(H, this, Jt).call(this, t) : Object.hasOwnProperty.call(t, "version") && Object.hasOwnProperty.call(t, "library") ? c(H, this, Yt).call(this, t) : c(H, this, vt).call(this, t);
   }
   getCitationItems() {
     return this._citationItems;
@@ -3134,7 +3234,7 @@ class ve {
     })), t;
   }
 }
-function Wt(e) {
+function qt(e) {
   var t = this;
   if (Object.hasOwnProperty.call(e, "schema"), Object.hasOwnProperty.call(e, "properties") && c(H, this, Pe).call(this, e.properties), Object.hasOwnProperty.call(e, "manualOverride") && (this._manualOverride = e.manualOverride), !Object.hasOwnProperty.call(e, "citationItems"))
     return console.error("citationItems is empty"), 0;
@@ -3143,10 +3243,10 @@ function Wt(e) {
   });
   return e.citationItems.forEach(function(n) {
     var s = n.id, r;
-    i.indexOf(s) >= 0 ? r = t._citationItems[i.indexOf(s)] : (r = new F(s), i.push(s)), typeof s == "number" && (s = c(H, t, Kt).call(t, n)), r.fillFromObject(n), c(H, t, Xe).call(t, r);
+    i.indexOf(s) >= 0 ? r = t._citationItems[i.indexOf(s)] : (r = new F(s), i.push(s)), typeof s == "number" && (s = c(H, t, $t).call(t, n)), r.fillFromObject(n), c(H, t, Xe).call(t, r);
   }, this), i.length;
 }
-function Dt(e) {
+function Jt(e) {
   var t = this;
   return e.citationItems.length === 0 ? (console.error("CSLCitation.citationItems: citationItems is empty"), 0) : (e.citationItems.length > 1 && console.warn("CSLCitation.citationItems: citationItems has more than one item"), e.citationItems.forEach(function(i) {
     c(H, t, vt).call(t, i);
@@ -3158,7 +3258,7 @@ function vt(e) {
   });
   return n.indexOf(t) >= 0 ? i = this._citationItems[n.indexOf(t)] : i = new F(t), i.fillFromObject(e), c(H, this, Xe).call(this, i), 1;
 }
-function zt(e) {
+function Yt(e) {
   if (!Object.hasOwnProperty.call(e, "data"))
     return console.error("Invalid citation object"), 0;
   var t = this._citationItems.map(function(s) {
@@ -3178,7 +3278,7 @@ function Pe(e) {
     Object.hasOwnProperty.call(e, i) && (t._properties[i] = e[i]);
   }, this), this;
 }
-function Kt(e) {
+function $t(e) {
   if (Object.hasOwnProperty.call(e, "uris") && e.uris.length) {
     var t = e.uris[0].lastIndexOf("/");
     return e.uris[0].slice(t + 1);
@@ -3191,7 +3291,7 @@ function ft() {
 var De = {
   _: /* @__PURE__ */ new Set()
 }, P = /* @__PURE__ */ new WeakMap(), Me = /* @__PURE__ */ new WeakMap(), Se = /* @__PURE__ */ new WeakMap(), Be = /* @__PURE__ */ new WeakMap(), q = /* @__PURE__ */ new WeakSet();
-class qt {
+class Zt {
   constructor() {
     re(this, q), T(this, P, void 0), T(this, Me, void 0), T(this, Se, void 0), T(this, Be, void 0), E(P, this, null), E(Me, this, window.Asc.plugin.button), E(Se, this, Asc.plugin.onThemeChanged), E(Be, this, Asc.plugin.onTranslate);
   }
@@ -3330,13 +3430,13 @@ function he() {
   a(P, this) && (a(P, this).close(), E(P, this, null)), window.Asc.plugin.button = a(Me, this), window.Asc.plugin.onThemeChanged = a(Se, this);
 }
 var ie = /* @__PURE__ */ new WeakMap(), g = /* @__PURE__ */ new WeakSet();
-class Jt {
+class Xt {
   /**
    * @param {LocalesManager} localesManager
    * @param {CslStylesManager} cslStylesManager
    */
   constructor(t, i) {
-    re(this, g), T(this, ie, void 0), this._bibPlaceholderIfEmpty = "Please insert some citation into the document.", this._citPrefixNew = "MENDELEY_CITATION", this._bibPrefixNew = "MENDELEY_BIBLIOGRAPHY", this._localesManager = t, this._cslStylesManager = i, this._storage = new Vt(), this._formatter, this.citationDocService = new Ht(this._citPrefixNew, this._bibPrefixNew), E(ie, this, new qt());
+    re(this, g), T(this, ie, void 0), this._bibPlaceholderIfEmpty = "Please insert some citation into the document.", this._citPrefixNew = "MENDELEY_CITATION", this._bibPrefixNew = "MENDELEY_BIBLIOGRAPHY", this._localesManager = t, this._cslStylesManager = i, this._storage = new zt(), this._formatter, this.citationDocService = new Ut(this._citPrefixNew, this._bibPrefixNew), E(ie, this, new Zt());
   }
   /** @returns {Promise<string | "INCORRECT_CONTROL" | null>} */
   getCurrentContentControlTag() {
@@ -3378,7 +3478,7 @@ class Jt {
         var r = t[s];
         n.fillFromObject(r);
       }
-      return i._storage.addCslCitation(n), c(g, i, Yt).call(i, n);
+      return i._storage.addCslCitation(n), c(g, i, jt).call(i, n);
     })();
   }
   /**
@@ -3422,7 +3522,7 @@ class Jt {
           var r, o = [yield c(g, t, Le).call(t, s, n)], l = yield t.citationDocService.updateContentControls(o);
           return (r = l[0]) !== null && r !== void 0 ? r : "";
         } else
-          return c(g, t, Xt).call(t, s);
+          return c(g, t, ti).call(t, s);
       } catch (h) {
         throw h;
       }
@@ -3569,16 +3669,16 @@ class Jt {
       var i = !0, n = yield t.citationDocService.getAddinMendeleyFields();
       if (n.length && (i = !1), i)
         return !1;
-      var s = yield a(ie, t).show("Update this document", "<p class='i18n'>" + G("Existing citations created with the Mendeley Desktop plugin are built using an old technology that is not compatible with Mendeley Cite. These citations have to be updated to start working with Mendeley Cite.") + "</p><p class='i18n'>" + G("Rest assured nothing has happened to your document or your citations.") + "</p><p class='i18n'>" + G("Press continue to be guided through the update process.") + "</p>");
+      var s = yield a(ie, t).show("Update this document", "<p class='i18n'>" + U("Existing citations created with the Mendeley Desktop plugin are built using an old technology that is not compatible with Mendeley Cite. These citations have to be updated to start working with Mendeley Cite.") + "</p><p class='i18n'>" + U("Rest assured nothing has happened to your document or your citations.") + "</p><p class='i18n'>" + U("Press continue to be guided through the update process.") + "</p>");
       if (s) {
         var {
           fieldsWithCitations: r,
           bibField: o
-        } = yield c(g, t, jt).call(t, n), l = r.map((h) => ({
+        } = yield c(g, t, ii).call(t, n), l = r.map((h) => ({
           field: h.field,
           newValue: c(g, t, He).call(t, JSON.stringify(h.cslCitation.toJSON()))
         }));
-        yield t.citationDocService.upgradeCslItems(l, o), a(ie, t).showInfoWindow("Update complete", G("Your document has been updated to use Mendeley Cite.") + " " + G("Please select the citation style and language for future citation formatting."), "success");
+        yield t.citationDocService.upgradeCslItems(l, o), a(ie, t).showInfoWindow("Update complete", U("Your document has been updated to use Mendeley Cite.") + " " + U("Please select the citation style and language for future citation formatting."), "success");
       } else
         Asc.plugin.executeCommand("close", "");
       return s;
@@ -3611,7 +3711,7 @@ class Jt {
     })();
   }
 }
-function Yt(e) {
+function jt(e) {
   var t = this, i = !1, n = t._cslStylesManager.getLastUsedFormat() === "note", s = null;
   return Promise.resolve().then(function() {
     if (e.getCitationItems().forEach(function(o) {
@@ -3622,7 +3722,7 @@ function Yt(e) {
         r.push(l);
       }), t._formatter.updateItems(r);
     }
-  }).then(() => c(g, this, $t).call(this, e)).then(function(r) {
+  }).then(() => c(g, this, Qt).call(this, e)).then(function(r) {
     n && (s = t._cslStylesManager.getLastUsedNotesStyle());
     var o = JSON.stringify(e.toJSON());
     return o = c(g, t, He).call(t, o), t.citationDocService.addCitation(r, o, s);
@@ -3652,7 +3752,7 @@ function gt() {
     return "";
   }
 }
-function $t(e) {
+function Qt(e) {
   var t = document.createDocumentFragment(), i = document.createElement("div"), n = this._storage.getCitationsPre(e.citationID), s = this._storage.getCitationsPost(e.citationID), r = this._storage.getAllCitationsInJson();
   this._formatter.rebuildProcessorState(r);
   var o = this._formatter.processCitationCluster(e.toJSON(), n, s), l = c(g, this, je).call(this, o[1][0][1]);
@@ -3684,7 +3784,7 @@ function ke(e) {
   }
   return t;
 }
-function Zt(e) {
+function ei(e) {
   var t, i = e.Value.indexOf("{"), n = e.Value.lastIndexOf("}");
   if (i !== -1) {
     var s = e.Value.slice(i, n + 1);
@@ -3712,9 +3812,9 @@ function ee(e, t, i) {
     };
   });
 }
-function Xt(e) {
+function ti(e) {
   var t = c(g, this, gt).call(this);
-  if (e && (t = G(this._bibPlaceholderIfEmpty)), this._cslStylesManager.isLastUsedStyleContainBibliography())
+  if (e && (t = U(this._bibPlaceholderIfEmpty)), this._cslStylesManager.isLastUsedStyleContainBibliography())
     return this.citationDocService.addBibliography(t);
   throw "The current bibliographic style does not describe the bibliography";
 }
@@ -3732,7 +3832,7 @@ function He(e) {
 }
 function Le(e, t) {
   if (e)
-    t.PlaceHolderText = G(this._bibPlaceholderIfEmpty);
+    t.PlaceHolderText = U(this._bibPlaceholderIfEmpty);
   else {
     var i = c(g, this, gt).call(this);
     t.PlaceHolderText = i;
@@ -3759,8 +3859,8 @@ function Je() {
       var b = s.innerText;
       if (!f.getDoNotUpdate()) {
         if (A !== C && !t) {
-          var B = "<p>" + G("You have modified this citation since Mendeley generated it. Do you want to keep your modifications and prevent future updates?") + "</p><p>" + G("Clicking „Yes“ will prevent Mendeley from updating this citation if you add additional citations, switch styles, or modify the item to which it refers. Clicking „No“ will erase your changes.") + "</p><p>" + G("Original:") + " " + b + "</p><p>" + G("Modified:") + " " + C + "</p>", N = yield a(ie, this).show("Saving custom edits", B);
-          N ? (f.setManualOverride(b, C), h.PlaceHolderText = "") : (h.PlaceHolderText = I, f.setManualOverride(b)), l = !0;
+          var B = "<p>" + U("You have modified this citation since Mendeley generated it. Do you want to keep your modifications and prevent future updates?") + "</p><p>" + U("Clicking „Yes“ will prevent Mendeley from updating this citation if you add additional citations, switch styles, or modify the item to which it refers. Clicking „No“ will erase your changes.") + "</p><p>" + U("Original:") + " " + b + "</p><p>" + U("Modified:") + " " + C + "</p>", O = yield a(ie, this).show("Saving custom edits", B);
+          O ? (f.setManualOverride(b, C), h.PlaceHolderText = "") : (h.PlaceHolderText = I, f.setManualOverride(b)), l = !0;
         } else
           (b !== C || A !== C || A !== b) && (l = !0), h.PlaceHolderText = I, f.setManualOverride(b);
         if (f) {
@@ -3803,7 +3903,7 @@ function Ye() {
     }), e;
   }), Ye.apply(this, arguments);
 }
-function jt(e) {
+function ii(e) {
   return $e.apply(this, arguments);
 }
 function $e() {
@@ -3811,7 +3911,7 @@ function $e() {
     var t = this;
     this._storage.clear(), ve.resetUsedIDs();
     var i = e.find((s) => s.Value.indexOf("Mendeley Bibliography") === 0), n = e.filter((s) => !i || i.FieldId !== s.FieldId).map((s) => {
-      var r = c(g, this, Zt).call(this, s);
+      var r = c(g, this, ei).call(this, s);
       r && r.citationItems && r.citationItems.forEach(function(l) {
         if (l.uris && l.uris.length) {
           var h = l.id;
@@ -3838,124 +3938,6 @@ function $e() {
       fieldsWithCitations: n
     };
   }), $e.apply(this, arguments);
-}
-var Qt = "26014", ei = "https://onlyoffice.github.io/sdkjs-plugins/content/mendeley/oauth.html";
-class ti {
-  static openModalAuth(t, i) {
-    var n = Date.now().toString(), s = "https://api.mendeley.com/oauth/authorize?client_id=".concat(Qt, "&redirect_uri=").concat(encodeURIComponent(ei), "&response_type=token&scope=all&state=").concat(n);
-    window.OAuthCallback = function(l, h) {
-      l && (localStorage.setItem("mendToken", l), localStorage.setItem("mendTokenExpiresAt", String(Date.now() + 720 * 60 * 60 * 1e3)), typeof t == "function" && t(l));
-    };
-    try {
-      window.open(s, "_blank");
-    } catch (l) {
-      console.error("Window open error:", l);
-    }
-    var r = 0, o = setInterval(() => {
-      r++;
-      var l = localStorage.getItem("mendToken");
-      if (l && l !== "DEMO_MODE_TOKEN") {
-        clearInterval(o), typeof t == "function" && t(l);
-        return;
-      }
-      r > 180 && clearInterval(o);
-    }, 1e3);
-  }
-}
-class ii {
-  /**
-   * @param {Router} router
-   */
-  constructor(t) {
-    this._router = t, this._onAuthorized = function() {
-    }, this._onOpen = function() {
-    };
-  }
-  init() {
-    var t = this;
-    U.info("LOGIN_INIT", {
-      message: "Initializing Mendeley Login Page"
-    }), this._bindDirectDOMEvents();
-    var i = {
-      /** @param {function(): void} callbackFn */
-      onOpen: function(r) {
-        return t._onOpen = r, i;
-      },
-      /** @param {function(): void} callbackFn */
-      onAuthorized: function(r) {
-        return t._onAuthorized = r, i;
-      }
-    }, n = this._getToken();
-    return n ? (U.info("LOGIN_CACHED_TOKEN_FOUND", {
-      hasToken: !0
-    }), t._hide(), setTimeout(() => t._onAuthorized(), 0), i) : (t._show(), setTimeout(() => {
-      we.hide(), t._onOpen();
-    }, 0), i);
-  }
-  _bindDirectDOMEvents() {
-    var t = this, i = document.getElementById("getBrowserTokenBtn");
-    i && (i.onclick = function(l) {
-      l.preventDefault(), t._openInAppModalAuth();
-    });
-    var n = document.getElementById("demoModeBtn");
-    n && (n.onclick = function(l) {
-      l.preventDefault(), t._startDemoMode();
-    });
-    var s = document.getElementById("connectTokenBtn"), r = document.getElementById("tokenField");
-    s && r && (s.onclick = function(l) {
-      l.preventDefault();
-      var h = r.value || "";
-      t._applyManualToken(h);
-    });
-    var o = document.getElementById("logoutLink");
-    o && (o.onclick = function(l) {
-      l.preventDefault(), localStorage.removeItem("mendToken"), localStorage.removeItem("mendTokenExpiresAt"), t._show();
-    });
-  }
-  _startDemoMode() {
-    U.info("START_DEMO_MODE", {}), this._saveToken("DEMO_MODE_TOKEN"), this._hide(), this._onAuthorized();
-  }
-  _openInAppModalAuth() {
-    var t = this;
-    U.info("OPENING_MODAL_AUTH", {}), ti.openModalAuth((i) => {
-      U.success("AUTH_SUCCESS", {}), t._saveToken(i), t._hide(), t._onAuthorized();
-    }, (i) => {
-      U.error("AUTH_ERROR", {
-        err: i
-      });
-    });
-  }
-  _applyManualToken(t) {
-    if (!(!t || !t.trim())) {
-      var i = t.trim();
-      if (i.startsWith("Bearer ") && (i = i.slice(7).trim()), i.includes("access_token=")) {
-        var n = i.match(/access_token=([^&]+)/);
-        n && n[1] && (i = n[1]);
-      }
-      this._saveToken(i), this._hide(), this._onAuthorized();
-    }
-  }
-  _hide() {
-    we.hide(), this._router.openMain();
-  }
-  _show() {
-    we.hide(), this._router.openLogin();
-  }
-  _getToken() {
-    var t = localStorage.getItem("mendToken"), i = localStorage.getItem("mendTokenExpiresAt");
-    return !t || !i || Date.now() > Number(i) ? null : t;
-  }
-  _saveToken(t) {
-    localStorage.setItem("mendToken", t), localStorage.setItem("mendTokenExpiresAt", String(Date.now() + 720 * 60 * 60 * 1e3));
-  }
-  getAuthFlow() {
-    var t = this;
-    return {
-      authenticate: () => this._show(),
-      getToken: () => t._getToken(),
-      refreshToken: () => !1
-    };
-  }
 }
 var Ce = {
   /**
@@ -4224,15 +4206,15 @@ oe.prototype.setDesktopApiAvailable = function(e) {
 oe.prototype.setRestApiAvailable = function(e) {
   this._isOnlineAvailable = e;
 };
-function O(e, t) {
-  if (this._router = e, this._displayNoneClass = t, this._saveBtn = new Ne("saveSettingsBtn", {
+function N(e, t) {
+  if (this._router = e, this._displayNoneClass = t, this._saveBtn = new Oe("saveSettingsBtn", {
     variant: "primary"
-  }), this._cancelBtn = new Ne("cancelBtn", {
+  }), this._cancelBtn = new Oe("cancelBtn", {
     variant: "secondary"
-  }), this._styleSelect = new Ue("styleSelectList", {
+  }), this._styleSelect = new Ve("styleSelectList", {
     placeholder: "Enter style name",
     sortable: !0
-  }), this._styleSelectListOther = new Ue("styleSelectedListOther", {
+  }), this._styleSelectListOther = new Ve("styleSelectedListOther", {
     placeholder: "Enter style name",
     searchable: !0
   }), this._notesStyleWrapper = document.getElementById("notesStyle"), !this._notesStyleWrapper)
@@ -4243,12 +4225,12 @@ function O(e, t) {
     label: "Endnotes"
   }), this._cslFileInput = document.getElementById("cslFileInput"), !this._cslFileInput)
     throw new Error("cslFileInput not found");
-  this._languageSelect = new Ue("styleLangList", {
+  this._languageSelect = new Ve("styleLangList", {
     placeholder: "Select language"
   }), this._cslStylesManager = new M("mendStyleId"), this._localesManager = new oe(), this._selectLists = [], this._onChangeState = function(i, n) {
-  }, this._styleMessage = new Oe("styleMessage", {
+  }, this._styleMessage = new Ne("styleMessage", {
     type: "error"
-  }), this._langMessage = new Oe("langMessage", {
+  }), this._langMessage = new Ne("langMessage", {
     type: "error"
   }), this._LANGUAGES = [["af-ZA", "Afrikaans"], ["ar", "Arabic"], ["bg-BG", "Bulgarian"], ["ca-AD", "Catalan"], ["cs-CZ", "Czech"], ["cy-GB", "Welsh"], ["da-DK", "Danish"], ["de-AT", "German (Austria)"], ["de-CH", "German (Switzerland)"], ["de-DE", "German (Germany)"], ["el-GR", "Greek"], ["en-GB", "English (UK)"], ["en-US", "English (US)"], ["es-CL", "Spanish (Chile)"], ["es-ES", "Spanish (Spain)"], ["es-MX", "Spanish (Mexico)"], ["et-EE", "Estonian"], ["eu", "Basque"], ["fa-IR", "Persian"], ["fi-FI", "Finnish"], ["fr-CA", "French (Canada)"], ["fr-FR", "French (France)"], ["he-IL", "Hebrew"], ["hr-HR", "Croatian"], ["hu-HU", "Hungarian"], ["id-ID", "Indonesian"], ["is-IS", "Icelandic"], ["it-IT", "Italian"], ["ja-JP", "Japanese"], ["km-KH", "Khmer"], ["ko-KR", "Korean"], ["la", "Latin"], ["lt-LT", "Lithuanian"], ["lv-LV", "Latvian"], ["mn-MN", "Mongolian"], ["nb-NO", "Norwegian (Bokmål)"], ["nl-NL", "Dutch"], ["nn-NO", "Norwegian (Nynorsk)"], ["pl-PL", "Polish"], ["pt-BR", "Portuguese (Brazil)"], ["pt-PT", "Portuguese (Portugal)"], ["ro-RO", "Romanian"], ["ru-RU", "Russian"], ["sk-SK", "Slovak"], ["sl-SI", "Slovenian"], ["sr-RS", "Serbian"], ["sv-SE", "Swedish"], ["th-TH", "Thai"], ["tr-TR", "Turkish"], ["uk-UA", "Ukrainian"], ["vi-VN", "Vietnamese"], ["zh-CN", "Chinese (PRC)"], ["zh-TW", "Chinese (Taiwan)"]], this._bNumFormat = !1, this._stateSettings = {
     style: "",
@@ -4256,35 +4238,35 @@ function O(e, t) {
     styleFormat: "numeric"
   };
 }
-O.prototype.getLocalesManager = function() {
+N.prototype.getLocalesManager = function() {
   return this._localesManager;
 };
-O.prototype.getStyleManager = function() {
+N.prototype.getStyleManager = function() {
   return this._cslStylesManager;
 };
-O.prototype.getLocale = function() {
+N.prototype.getLocale = function() {
   return this._localesManager.getLocale();
 };
-O.prototype.getLastUsedStyleId = function() {
+N.prototype.getLastUsedStyleId = function() {
   return this._cslStylesManager.getLastUsedStyleId();
 };
-O.prototype.init = function() {
+N.prototype.init = function() {
   this._cslStylesManager.setRestApiAvailable(!0), this._localesManager.setRestApiAvailable(!0);
   var e = this._cslStylesManager.getLastUsedStyleId() || "ieee", t = this._localesManager.getLastUsedLanguage();
   this._addEventListeners(), this._languageSelect.addItems(this._LANGUAGES, t);
   var i = [this._onStyleChange(e), this._localesManager.loadLocale(t), this._loadStyles()];
   return Promise.all(i);
 };
-O.prototype.onChangeState = function(e) {
+N.prototype.onChangeState = function(e) {
   this._onChangeState = e;
 };
-O.prototype.setDesktopApiAvailable = function(e) {
+N.prototype.setDesktopApiAvailable = function(e) {
   this._localesManager.setDesktopApiAvailable(e), this._cslStylesManager.setDesktopApiAvailable(e);
 };
-O.prototype.setRestApiAvailable = function(e) {
+N.prototype.setRestApiAvailable = function(e) {
   this._localesManager.setRestApiAvailable(e), this._cslStylesManager.setRestApiAvailable(e);
 };
-O.prototype._addEventListeners = function() {
+N.prototype._addEventListeners = function() {
   var e = this;
   this._saveBtn.subscribe(function(t) {
     if (t.type === "button:click") {
@@ -4295,7 +4277,7 @@ O.prototype._addEventListeners = function() {
       }
       var n = pe({}, e._stateSettings), s = [];
       e._stateSettings.language !== i && (e._localesManager.saveLastUsedLanguage(i), s.push(e._localesManager.loadLocale(i).catch(function(l) {
-        throw console.error(l), e._langMessage.show(G("Failed to load language")), l;
+        throw console.error(l), e._langMessage.show(U("Failed to load language")), l;
       })));
       var r = "footnotes";
       e._endNotes.getState().checked && (r = "endnotes"), e._stateSettings.notesStyle !== r && (e._cslStylesManager.saveLastUsedNotesStyle(r), e._cslStylesManager.getLastUsedFormat() === "note" && s.push(Promise.resolve()));
@@ -4332,7 +4314,7 @@ O.prototype._addEventListeners = function() {
         e._cslStylesManager.addCustomStyle(n).then(function(s) {
           e._addStylesToList([s]);
         }).catch(function(s) {
-          console.error(s), e._styleMessage.show(G("Invalid CSL style file"));
+          console.error(s), e._styleMessage.show(U("Invalid CSL style file"));
         }).finally(function() {
           e._hideLoader();
         });
@@ -4359,13 +4341,13 @@ O.prototype._addEventListeners = function() {
     e._somethingWasChanged();
   });
 };
-O.prototype._hideAllMessages = function() {
+N.prototype._hideAllMessages = function() {
   this._langMessage.close(), this._styleMessage.close();
 };
-O.prototype._hide = function() {
+N.prototype._hide = function() {
   this._router.openMain();
 };
-O.prototype.show = function() {
+N.prototype.show = function() {
   this._stateSettings = {
     language: this._localesManager.getLastUsedLanguage(),
     style: this._cslStylesManager.getLastUsedStyleIdOrDefault(),
@@ -4373,7 +4355,7 @@ O.prototype.show = function() {
     styleFormat: this._cslStylesManager.getLastUsedFormat()
   }, this._saveBtn.disable(), this._router.openSettings(), this._stateSettings.notesStyle === this._endNotes.getState().value ? this._endNotes.check() : this._footNotes.check();
 };
-O.prototype._loadStyles = function() {
+N.prototype._loadStyles = function() {
   var e = this;
   return this._cslStylesManager.getStylesInfo().then(
     /** @param {Array<StyleInfo>} stylesInfo*/
@@ -4384,7 +4366,7 @@ O.prototype._loadStyles = function() {
     console.error(t);
   });
 };
-O.prototype._addStylesToList = function(e) {
+N.prototype._addStylesToList = function(e) {
   var t = this, i = this._cslStylesManager.getLastUsedStyleIdOrDefault(), n = e.map(function(r) {
     return [r.name, r.title];
   }), s = n.filter(function(r) {
@@ -4392,22 +4374,22 @@ O.prototype._addStylesToList = function(e) {
   });
   this._styleSelect.addItems(s, i), this._styleSelectListOther.addItems(n, i);
 };
-O.prototype._somethingWasChanged = function() {
+N.prototype._somethingWasChanged = function() {
   this._saveBtn.enable();
 };
-O.prototype._onStyleChange = function(e, t) {
+N.prototype._onStyleChange = function(e, t) {
   var i = this;
   return t && i._showLoader(), i._cslStylesManager.getStyle(e, !t).then(function(n) {
     var s = n.styleFormat;
     i._bNumFormat = s == "numeric", s === "note" ? i._notesStyleWrapper.classList.remove(i._displayNoneClass) : i._notesStyleWrapper.classList.add(i._displayNoneClass), t && i._hideLoader();
   }).catch(function(n) {
-    throw console.error(n), typeof n == "string" && i._styleMessage.show(G(n)), t && i._hideLoader(), n;
+    throw console.error(n), typeof n == "string" && i._styleMessage.show(U(n)), t && i._hideLoader(), n;
   });
 };
-O.prototype._showLoader = function() {
+N.prototype._showLoader = function() {
   this._cancelBtn.disable(), this._saveBtn.disable(), this._styleSelect.disable(), this._languageSelect.disable();
 };
-O.prototype._hideLoader = function() {
+N.prototype._hideLoader = function() {
   this._cancelBtn.enable(), this._saveBtn.enable(), this._styleSelect.enable(), this._languageSelect.enable();
 };
 class ni {
@@ -4541,9 +4523,9 @@ class ni {
     l = document.getElementById("searchField"), h = document.getElementById("insertLinkBtn"), f = document.getElementById("cancelSelectBtn"), _ = document.getElementById("moreMenuBtn"), d = document.getElementById("moreDropdown"), p = document.getElementById("libraryGroupSelect"), o = new ni(e);
   }
   window.Asc.plugin.init = function() {
-    m(), t = new ge(), r = new ii(t), i = new It({
+    m(), t = new ge(), r = new Vt(t), i = new It({
       authFlow: r.getAuthFlow()
-    }), n = new O(t, e), s = new Jt(n.getLocalesManager(), n.getStyleManager()), A(), r.init().onOpen(function() {
+    }), n = new N(t, e), s = new Xt(n.getLocalesManager(), n.getStyleManager()), A(), r.init().onOpen(function() {
       we.hide();
     }).onAuthorized(function() {
       we.hide(), t.openMain(), I();
@@ -4553,8 +4535,8 @@ class ni {
     var C = document.getElementById("libLoader");
     C && C.classList.remove("hidden"), i.getUserGroups().then((b) => {
       p && b && b.length && (p.innerHTML = '<option value="all">All References</option>', b.forEach((B) => {
-        var N = document.createElement("option");
-        N.value = B.id, N.innerText = B.name, p.appendChild(N);
+        var O = document.createElement("option");
+        O.value = B.id, O.innerText = B.name, p.appendChild(O);
       }));
     }).catch((b) => console.warn(b)), n.init().catch((b) => console.warn(b)), i.getItems(null).then((b) => {
       o.clearLibrary(), o.displaySearchItems(b, null, null);
@@ -4565,7 +4547,7 @@ class ni {
     });
   }
   function A() {
-    var C, b, B, N, Z;
+    var C, b, B, O, Z;
     if (o.subscribe((x, R) => {
       h && (h.disabled = x === 0);
     }), l) {
@@ -4610,7 +4592,7 @@ class ni {
     }), (B = document.getElementById("menuSettings")) === null || B === void 0 || B.addEventListener("click", () => {
       var x;
       (x = d) === null || x === void 0 || x.classList.add("hidden"), n.show();
-    }), (N = document.getElementById("settingsBackBtn")) === null || N === void 0 || N.addEventListener("click", () => {
+    }), (O = document.getElementById("settingsBackBtn")) === null || O === void 0 || O.addEventListener("click", () => {
       t.openMain();
     }), (Z = document.getElementById("menuUnlink")) === null || Z === void 0 || Z.addEventListener("click", () => {
       var x;

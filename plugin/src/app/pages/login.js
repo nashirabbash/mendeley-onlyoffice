@@ -8,18 +8,13 @@
 
 // @ts-check
 
-/**
- * @typedef {import('../router').Router} Router
- */
-
-import { InputField, Button, Message, Loader } from "../shared/components";
-import { translate } from "../services";
+import { Loader } from "../shared/components";
 import { logger } from "../services/logger-service";
 import { AuthModalManager } from "../services/auth-modal-manager";
 
 class LoginPage {
     /**
-     * @param {Router} router
+     * @param {any} router
      */
     constructor(router) {
         this._router = router;
@@ -29,25 +24,43 @@ class LoginPage {
 
     init() {
         const self = this;
-        logger.info("LOGIN_INIT", { message: "Initializing Mendeley Login Page" });
-        this._bindDirectDOMEvents();
+        logger.info("LOGIN_PAGE_INIT", {});
+
+        // Expose global window click functions for instant inline triggering
+        // @ts-ignore
+        window.onSignInClick = function () {
+            logger.info("CLICK_SIGN_IN", {});
+            self._openInAppModalAuth();
+        };
+
+        // @ts-ignore
+        window.onDemoModeClick = function () {
+            logger.info("CLICK_DEMO_MODE", {});
+            self._startDemoMode();
+        };
+
+        // @ts-ignore
+        window.onConnectTokenClick = function () {
+            const input = /** @type {HTMLInputElement} */ (document.getElementById("tokenField"));
+            if (input && input.value) {
+                self._applyManualToken(input.value);
+            }
+        };
 
         const triggers = {
-            /** @param {function(): void} callbackFn */
-            onOpen: function (callbackFn) {
-                self._onOpen = callbackFn;
+            onOpen: function (cb) {
+                self._onOpen = cb;
                 return triggers;
             },
-            /** @param {function(): void} callbackFn */
-            onAuthorized: function (callbackFn) {
-                self._onAuthorized = callbackFn;
+            onAuthorized: function (cb) {
+                self._onAuthorized = cb;
                 return triggers;
             },
         };
 
         const existingToken = this._getToken();
         if (existingToken) {
-            logger.info("LOGIN_CACHED_TOKEN_FOUND", { hasToken: true });
+            logger.info("CACHED_TOKEN_FOUND", {});
             self._hide();
             setTimeout(() => self._onAuthorized(), 0);
             return triggers;
@@ -62,49 +75,7 @@ class LoginPage {
         return triggers;
     }
 
-    _bindDirectDOMEvents() {
-        const self = this;
-
-        const btnBrowser = document.getElementById("getBrowserTokenBtn");
-        if (btnBrowser) {
-            btnBrowser.onclick = function (e) {
-                e.preventDefault();
-                self._openInAppModalAuth();
-            };
-        }
-
-        const btnDemo = document.getElementById("demoModeBtn");
-        if (btnDemo) {
-            btnDemo.onclick = function (e) {
-                e.preventDefault();
-                self._startDemoMode();
-            };
-        }
-
-        const btnConnect = document.getElementById("connectTokenBtn");
-        const tokenInput = document.getElementById("tokenField");
-        if (btnConnect && tokenInput) {
-            btnConnect.onclick = function (e) {
-                e.preventDefault();
-                // @ts-ignore
-                const raw = tokenInput.value || "";
-                self._applyManualToken(raw);
-            };
-        }
-
-        const logout = document.getElementById("logoutLink");
-        if (logout) {
-            logout.onclick = function (e) {
-                e.preventDefault();
-                localStorage.removeItem("mendToken");
-                localStorage.removeItem("mendTokenExpiresAt");
-                self._show();
-            };
-        }
-    }
-
     _startDemoMode() {
-        logger.info("START_DEMO_MODE", {});
         this._saveToken("DEMO_MODE_TOKEN");
         this._hide();
         this._onAuthorized();
@@ -112,15 +83,12 @@ class LoginPage {
 
     _openInAppModalAuth() {
         const self = this;
-        logger.info("OPENING_MODAL_AUTH", {});
-        
         AuthModalManager.openModalAuth((token) => {
-            logger.success("AUTH_SUCCESS", {});
             self._saveToken(token);
             self._hide();
             self._onAuthorized();
         }, (err) => {
-            logger.error("AUTH_ERROR", { err });
+            console.error("Auth error:", err);
         });
     }
 
